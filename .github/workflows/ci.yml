@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # NOTE: 'pnpm build:tokens' is deliberately NOT run here.
+      #
+      # packages/tokens/dist/ is committed and is currently the authoritative
+      # token layer. It is RICHER than what the generator can reproduce:
+      #
+      #   - chartSequence (8 values) exists only in dist/tokens.js|ts and has
+      #     no counterpart in brand.json, so a rebuild deletes it.
+      #   - The generator emits a different public API (color.light, palette,
+      #     dimension, typography, shadow) than the one packages consume
+      #     (semantic, palettes, space, radius, text, arabic, chartSequence).
+      #
+      # Rebuilding in CI would therefore publish a broken token package.
+      # See docs/TOKEN-PIPELINE.md for what has to be reconciled before this
+      # step can be turned back on.
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test

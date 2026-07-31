@@ -1,0 +1,67 @@
+name: Release
+
+# Publishes every @al-rayhaanat/* package to GitHub Packages.
+#
+# The packages move together on one version (see packages/README.md — a /shell
+# newer than its /patterns is exactly the drift this system exists to prevent),
+# so releases go through Changesets rather than per-package version bumps.
+#
+#   pnpm changeset          # describe the change, pick the bump
+#   git commit && git push  # this workflow opens a "Version Packages" PR
+#   merge that PR           # this workflow publishes
+#
+# Or run it by hand from the Actions tab.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the version PR and tags
+      packages: write # publish to GitHub Packages
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@al-rayhaanat"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Tokens are NOT rebuilt here — packages/tokens/dist/ is committed and is
+      # authoritative. Rebuilding would drop chartSequence and reshape the
+      # public token API. See docs/TOKEN-PIPELINE.md.
+
+      - name: Build global bundle
+        run: pnpm build:bundle
+
+      # Opens a "Version Packages" PR when changesets are pending; publishes
+      # when that PR has been merged and no changesets remain.
+      - name: Create release PR or publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          publish: pnpm release
+          commit: "chore: version packages"
+          title: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

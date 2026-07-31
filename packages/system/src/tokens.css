@@ -1,0 +1,6 @@
+/* @al-rayhaanat/system/tokens.css — the whole token layer, one import.
+   Kept as a file rather than an exports alias because a package exports target
+   must be a relative path; a bare specifier raises ERR_INVALID_PACKAGE_TARGET.
+   The import below uses the tokens package's PUBLIC subpath — deep paths such as
+   ./dist/tokens.css are not in its exports map and bundlers refuse them. */
+@import "@al-rayhaanat/tokens/tokens.css";

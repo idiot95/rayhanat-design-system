@@ -1,0 +1,47 @@
+{
+  "name": "@al-rayhaanat/system",
+  "version": "1.3.0",
+  "description": "The whole design system in one dependency — every package, plus the token stylesheet. Install this unless you have a reason not to.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "sideEffects": [
+    "*.css",
+    "./src/index.js"
+  ],
+  "exports": {
+    ".": {
+      "source": "./src/index.js",
+      "default": "./src/index.js"
+    },
+    "./tokens.css": "./src/tokens.css"
+  },
+  "dependencies": {
+    "@al-rayhaanat/tokens": "workspace:*",
+    "@al-rayhaanat/contracts": "workspace:*",
+    "@al-rayhaanat/icons": "workspace:*",
+    "@al-rayhaanat/motion": "workspace:*",
+    "@al-rayhaanat/ui": "workspace:*",
+    "@al-rayhaanat/prose": "workspace:*",
+    "@al-rayhaanat/table": "workspace:*",
+    "@al-rayhaanat/filters": "workspace:*",
+    "@al-rayhaanat/patterns": "workspace:*",
+    "@al-rayhaanat/forms": "workspace:*",
+    "@al-rayhaanat/shell": "workspace:*",
+    "@al-rayhaanat/charts": "workspace:*",
+    "@al-rayhaanat/slides": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "files": [
+    "src"
+  ],
+  "arh": {
+    "distribution": "source-jsx",
+    "requiresTranspile": true
+  }
+}
