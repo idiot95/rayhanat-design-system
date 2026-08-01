@@ -306,7 +306,9 @@ export function Tabs({ items = [], value, onChange, variant = "rule", children }
               {label}
               {item.count !== undefined && (
                 <span style={{ fontSize: "var(--text-2xs)", fontFeatureSettings: "'tnum'",
-                  color: "var(--text-muted)" }}>{item.count}</span>
+                  color: on && variant === "pill" ? "var(--text-on-interactive)"
+                    : on ? "var(--interactive)" : "var(--text-muted)"
+                }}>{item.count}</span>
               )}
             </button>
           );
@@ -645,41 +647,59 @@ const GHOST_MS = { instant: 0, fast: 120, normal: 200, slow: 320 };
  */
 export function GhostButton({
   icon, label, tone = "accent", active, count, expanded, size = "md",
-  hint = true, disabled, onClick, style, ...rest
+  hint = true, showLabel, disabled, onClick, style, ...rest
 }) {
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const t = GHOST_TONES[tone] || GHOST_TONES.accent;
   const dim = GHOST_SIZES[size] || GHOST_SIZES.md;
   const lit = active || expanded;
-  const show = (hover || focus) && hint && !expanded;
+  /* A labelled control says what it is, so the tooltip would only repeat it. */
+  const show = (hover || focus) && hint && !expanded && !showLabel;
+
+  const skin = {
+    color: lit || hover ? t.ink : "var(--text-secondary)",
+    background: lit ? t.tint : hover ? t.hover : "transparent",
+    transitionProperty: "background-color, color",
+    transitionDuration: "var(--duration-fast)",
+    transitionTimingFunction: "var(--ease-standard)",
+    ...style
+  };
+  const shared = {
+    disabled,
+    onClick,
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+    onFocus: () => setFocus(true),
+    onBlur: () => setFocus(false),
+    "aria-expanded": expanded === undefined ? undefined : !!expanded,
+    "aria-pressed": expanded === undefined && active !== undefined ? !!active : undefined
+  };
 
   return (
     <span style={{ position: "relative", display: "inline-flex" }}>
-      <IconButton
-        name={icon}
-        label={count === undefined || count === null ? label : `${label}, ${count} applied`}
-        variant="ghost"
-        size={size}
-        disabled={disabled}
-        aria-expanded={expanded === undefined ? undefined : !!expanded}
-        aria-pressed={expanded === undefined && active !== undefined ? !!active : undefined}
-        onClick={onClick}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-        style={{
-          color: lit || hover ? t.ink : "var(--text-secondary)",
-          background: lit ? t.tint : hover ? t.hover : "transparent",
-          transitionProperty: "background-color, color",
-          transitionDuration: "var(--duration-fast)",
-          transitionTimingFunction: "var(--ease-standard)",
-          ...style
-        }}
-        {...rest}
-      />
-      {active && (
+      {showLabel ? (
+        /* The rail names its destinations rather than relying on a glyph; a
+           toolbar that sits beside one should read the same way. */
+        <Button variant="ghost" size={size} icon={icon} {...shared} style={skin} {...rest}>
+          {label}
+          {count ? (
+            <span className="arh-tnum" style={{ fontSize: "var(--text-2xs)",
+              color: lit ? t.ink : "var(--text-muted)" }}>{count}</span>
+          ) : null}
+        </Button>
+      ) : (
+        <IconButton
+          name={icon}
+          label={count === undefined || count === null ? label : `${label}, ${count} applied`}
+          variant="ghost"
+          size={size}
+          {...shared}
+          style={skin}
+          {...rest}
+        />
+      )}
+      {active && !showLabel && (
         <span aria-hidden="true" style={{ position: "absolute", insetBlockStart: 3,
           insetInlineEnd: 3, inlineSize: 6, blockSize: 6, borderRadius: "var(--radius-full)",
           background: t.dot, pointerEvents: "none" }} />
@@ -791,7 +811,7 @@ export function ExpandingSearch({
  * because a menu that strands the keyboard is worse than no menu.
  */
 export function GhostMenu({
-  icon, label, tone = "accent", active, count, size = "md",
+  icon, label, tone = "accent", active, count, size = "md", showLabel,
   open: openProp, onOpenChange, align = "end", width = 220, children, style
 }) {
   const [ownOpen, setOwnOpen] = useState(false);
@@ -803,24 +823,28 @@ export function GhostMenu({
   const wrap = useRef(null);
   /* A panel anchored to its trigger's inline-end runs leftward, and a trigger
      near the start of a scrolling region pushes it outside — where the region's
-     overflow clips it and it reads as "hidden behind the nav". Measure as the
-     panel attaches and anchor the other way when there is no room. Measuring in
-     an effect is too early: Transition mounts the node a tick later. */
+     overflow clips it and it reads as "hidden behind the nav". So it flips.
+
+     Measure the TRIGGER, not the panel. Measuring the panel means rendering it
+     on the wrong side first and correcting after, which is a visible jump. The
+     trigger is already on screen and `width` is known, so the side can be
+     decided before the panel has ever been laid out — and this effect batches
+     with the one Transition uses to mount it, so it renders once, in place. */
   const [flipped, setFlipped] = useState(false);
   const side = flipped ? (align === "start" ? "end" : "start") : align;
 
-  const measure = useCallback(node => {
-    if (!node || !wrap.current) return;
-    const box = node.getBoundingClientRect();
+  useEffect(() => {
+    if (!open || !wrap.current) { setFlipped(false); return; }
+    const t = wrap.current.getBoundingClientRect();
     let clip = wrap.current.parentElement;
     while (clip && clip !== document.body && getComputedStyle(clip).overflowX === "visible") clip = clip.parentElement;
     const bounds = clip && clip !== document.body
       ? clip.getBoundingClientRect()
       : { left: 0, right: window.innerWidth };
-    setFlipped(box.left < bounds.left + 1 || box.right > bounds.right - 1);
-  }, []);
-
-  useEffect(() => { if (!open) setFlipped(false); }, [open]);
+    const rtl = getComputedStyle(wrap.current).direction === "rtl";
+    const anchorEnd = (align === "end") !== rtl;   /* which physical edge it hangs from */
+    setFlipped(anchorEnd ? t.right - width < bounds.left : t.left + width > bounds.right);
+  }, [open, align, width]);
 
   useEffect(() => {
     if (!open) return;
@@ -839,16 +863,20 @@ export function GhostMenu({
   return (
     <span ref={wrap} style={{ position: "relative", display: "inline-flex", ...style }}>
       <GhostButton icon={icon} label={label} tone={tone} active={active} count={count}
-        size={size} expanded={open} onClick={() => setOpen(!open)} />
-      <Transition show={open} preset="fade-down" duration="fast">
-        <div role="menu" ref={measure} style={{ position: "absolute", insetBlockStart: "calc(100% + var(--space-2))",
+        size={size} showLabel={showLabel} expanded={open} onClick={() => setOpen(!open)} />
+      {/* The Transition IS the panel — it must not WRAP one. A transform makes an
+          element the containing block for its absolutely-positioned descendants,
+          so an absolute panel nested inside re-anchors the moment the entrance
+          settles to `transform: none`, and the menu visibly jumps. Modal and
+          Drawer already style the Transition directly; this now matches. */}
+      <Transition show={open} preset="fade-down" duration="fast" role="menu"
+        style={{ position: "absolute", insetBlockStart: "calc(100% + var(--space-2))",
           [side === "start" ? "insetInlineStart" : "insetInlineEnd"]: 0, minInlineSize: width,
           zIndex: "var(--z-popover)", background: "var(--surface-raised)",
           borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-lg)",
           borderWidth: "var(--border-hairline)", borderStyle: "solid", borderColor: "var(--border)",
           padding: "var(--space-3)", display: "grid", gap: "var(--space-1)" }}>
-          {children}
-        </div>
+        {children}
       </Transition>
     </span>
   );

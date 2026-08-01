@@ -96,9 +96,9 @@ export default function ProsePage() {
               <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)",
                 color: "var(--text-muted)" }}>Steps</span>
               <Steps items={[
-                "Authenticate once per machine.",
-                "Point the scope at the registry.",
-                "Install the umbrella package."
+                { title: "Authenticate", body: "A token with read:packages, once per machine." },
+                { title: "Point the scope", body: "An .npmrc redirecting @al-rayhaanat, once per project." },
+                { title: "Install", body: "pnpm add @al-rayhaanat/system." }
               ]} />
             </Stack>
             <Stack gap={2}>

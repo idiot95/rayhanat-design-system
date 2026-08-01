@@ -152,24 +152,37 @@ export function NumberedList({ items = [], start = 1, style }) {
 export function Steps({ items = [], style }) {
   return (
     <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", ...style }}>
-      {items.map((it, i) => (
-        <li key={i} style={{ display: "grid", gridTemplateColumns: "auto minmax(0,1fr)",
-          gap: "var(--space-4)" }}>
-          <div style={{ display: "grid", justifyItems: "center", gridTemplateRows: "auto 1fr" }}>
-            <span className="arh-tnum" style={{ inlineSize: 24, blockSize: 24, borderRadius: "var(--radius-full)",
-              display: "grid", placeItems: "center", fontSize: "var(--text-2xs)",
-              fontFamily: "var(--font-display)", fontWeight: "var(--weight-semibold)",
-              color: "var(--text-on-interactive)", background: "var(--interactive-solid)" }}>{i + 1}</span>
-            {i < items.length - 1 && <span style={{ inlineSize: 1, background: "var(--border)" }} />}
-          </div>
-          <div style={{ paddingBlockEnd: "var(--space-5)" }}>
-            <div style={{ fontFamily: "var(--font-display)", fontWeight: "var(--weight-semibold)",
-              fontSize: "var(--text-md)" }}>{it.title}</div>
-            {it.body && <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)",
-              marginBlockStart: "var(--space-1)" }}>{it.body}</div>}
-          </div>
-        </li>
-      ))}
+      {items.map((it, i) => {
+        /* Its siblings — BulletList, NumberedList — take a plain string, so this
+           one does too. Reading `it.title` off a string yielded an empty step,
+           which collapsed the row to the marker and left the connector between
+           the dots with no height to fill. */
+        const title = typeof it === "string" ? it : it.title;
+        const body = typeof it === "string" ? null : it.body;
+        return (
+          <li key={i} style={{ display: "grid", gridTemplateColumns: "auto minmax(0,1fr)",
+            gap: "var(--space-4)" }}>
+            <div style={{ display: "grid", justifyItems: "center", gridTemplateRows: "auto 1fr" }}>
+              <span className="arh-tnum" style={{ inlineSize: 24, blockSize: 24, borderRadius: "var(--radius-full)",
+                display: "grid", placeItems: "center", fontSize: "var(--text-2xs)",
+                fontFamily: "var(--font-display)", fontWeight: "var(--weight-semibold)",
+                color: "var(--text-on-interactive)", background: "var(--interactive-solid)" }}>{i + 1}</span>
+              {/* minBlockSize so a one-line step still draws a rule to the next
+                  dot — a `1fr` row on a short step resolves to nothing. */}
+              {i < items.length - 1 && (
+                <span style={{ inlineSize: 1, minBlockSize: "var(--space-5)",
+                  background: "var(--border)" }} />
+              )}
+            </div>
+            <div style={{ paddingBlockEnd: "var(--space-5)" }}>
+              <div style={{ fontFamily: "var(--font-display)", fontWeight: "var(--weight-semibold)",
+                fontSize: "var(--text-md)" }}>{title}</div>
+              {body && <div style={{ fontSize: "var(--text-sm)", color: "var(--text-secondary)",
+                marginBlockStart: "var(--space-1)" }}>{body}</div>}
+            </div>
+          </li>
+        );
+      })}
     </ol>
   );
 }

@@ -5,8 +5,13 @@
  * Depends on @al-rayhaanat/tokens, /icons, /ui, /table.
  *
  * Model
- *   filter        { id, field, operator, value, value2? }
+ *   filter        { id, field, operator, value, value2?, join? }
  *   group         { combinator: 'and' | 'or', filters: Filter[] }
+ *
+ *   `join` is the clause BEFORE a filter — 'and' | 'or' — so a group can mix
+ *   them. It is ignored on the first filter, evaluated strictly left to right
+ *   with no precedence (what the reader sees is what runs), and falls back to
+ *   the group combinator when absent, so older links still resolve.
  *
  * URL serialisation
  *   ?f=field:op:value~field:op:value&fc=or
@@ -94,9 +99,12 @@ function matches(row, f) {
 export function applyFilters(rows, group) {
   const active = (group.filters || []).filter(f => f.field && f.operator);
   if (active.length === 0) return rows;
-  return rows.filter(row => group.combinator === "or"
-    ? active.some(f => matches(row, f))
-    : active.every(f => matches(row, f)));
+  return rows.filter(row => active.reduce((acc, f, i) => {
+    const m = matches(row, f);
+    if (i === 0) return m;
+    const join = f.join || group.combinator || "and";
+    return join === "or" ? acc || m : acc && m;
+  }, true));
 }
 
 /* ── URL serialisation ──────────────────────────────────────────────────── */
@@ -105,7 +113,11 @@ export function serializeFilters(group) {
     const v = Array.isArray(f.value) ? f.value.join(",")
       : f.operator === "between" ? `${f.value ?? ""}|${f.value2 ?? ""}`
       : f.value ?? "";
-    return [f.field, f.operator, encodeURIComponent(v)].join(":");
+    /* Values are encodeURIComponent'd, so ':' never survives into one — the
+       fourth segment is unambiguous, and absent on the first filter. */
+    const seg = [f.field, f.operator, encodeURIComponent(v)];
+    if (f.join) seg.push(f.join);
+    return seg.join(":");
   });
   const p = new URLSearchParams();
   if (parts.length) p.set("f", parts.join("~"));
@@ -118,12 +130,13 @@ export function parseFilters(search) {
   const combinator = p.get("fc") === "or" ? "or" : "and";
   if (!raw) return { combinator, filters: [] };
   const filters = raw.split("~").map(part => {
-    const [field, operator, encoded = ""] = part.split(":");
+    const [field, operator, encoded = "", join] = part.split(":");
     const value = decodeURIComponent(encoded);
     const meta = OP_META[operator] || {};
-    if (meta.multi) return { id: nextId(), field, operator, value: value ? value.split(",") : [] };
-    if (meta.binary) { const [a, b] = value.split("|"); return { id: nextId(), field, operator, value: a, value2: b }; }
-    return { id: nextId(), field, operator, value };
+    const base = { id: nextId(), field, operator, ...(join ? { join } : null) };
+    if (meta.multi) return { ...base, value: value ? value.split(",") : [] };
+    if (meta.binary) { const [a, b] = value.split("|"); return { ...base, value: a, value2: b }; }
+    return { ...base, value };
   });
   return { combinator, filters };
 }
@@ -161,14 +174,20 @@ export function useFilters({ fields, initial, syncUrl = true, storageKey }) {
   const add = useCallback(fieldKey => {
     const field = fields.find(f => f.key === fieldKey) || fields[0];
     const op = (OPERATORS[field.type] || OPERATORS.text)[0].op;
-    setGroup(g => ({ ...g, filters: [...g.filters, { id: nextId(), field: field.key, operator: op, value: "" }] }));
+    setGroup(g => ({ ...g, filters: [...g.filters,
+      { id: nextId(), field: field.key, operator: op, value: "",
+        ...(g.filters.length ? { join: g.combinator || "and" } : null) }] }));
   }, [fields]);
   const update = useCallback((id, patch) =>
     setGroup(g => ({ ...g, filters: g.filters.map(f => (f.id === id ? { ...f, ...patch } : f)) })), []);
   const remove = useCallback(id =>
     setGroup(g => ({ ...g, filters: g.filters.filter(f => f.id !== id) })), []);
   const clear = useCallback(() => setGroup(g => ({ ...g, filters: [] })), []);
-  const setCombinator = useCallback(c => setGroup(g => ({ ...g, combinator: c })), []);
+  /** Sets the default AND rewrites every existing clause, so "match all" means it. */
+  const setCombinator = useCallback(c => setGroup(g => ({
+    ...g, combinator: c,
+    filters: g.filters.map((f, i) => (i === 0 ? f : { ...f, join: c }))
+  })), []);
   /** Replace the whole group — how a preset, scope or saved view is applied. */
   const replace = useCallback(next => setGroup({
     combinator: next.combinator || "and",
@@ -192,12 +211,28 @@ export function useFilters({ fields, initial, syncUrl = true, storageKey }) {
 }
 
 /* ── one filter row ─────────────────────────────────────────────────────── */
-function FilterRow({ filter, fields, onChange, onRemove }) {
+function FilterRow({ filter, fields, onChange, onRemove, index = 0 }) {
   const field = fields.find(f => f.key === filter.field) || fields[0];
   const ops = OPERATORS[field.type] || OPERATORS.text;
   const meta = OP_META[filter.operator] || {};
+  const join = filter.join || "and";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap" }}>
+      {/* The clause belongs to the line it precedes, so every row after the
+          first carries its own — a group can read "state is open OR folios > 10".
+          The first row is a fixed label, because there is nothing to join to. */}
+      <span style={{ inlineSize: 78, flex: "none" }}>
+        {index === 0 ? (
+          <span style={{ display: "inline-flex", alignItems: "center", blockSize: 28,
+            paddingInline: "var(--space-3)", fontSize: "var(--text-2xs)",
+            letterSpacing: "var(--tracking-kicker)", textTransform: "uppercase",
+            color: "var(--text-muted)" }}>Where</span>
+        ) : (
+          <Select size="sm" value={join} aria-label="Clause"
+            options={[{ value: "and", label: "and" }, { value: "or", label: "or" }]}
+            onChange={e => onChange({ join: e.target.value })} />
+        )}
+      </span>
       <span style={{ inlineSize: 150 }}>
         <Select size="sm" value={filter.field}
           options={fields.map(f => ({ value: f.key, label: f.label }))}
@@ -316,8 +351,8 @@ export function FilterBar({ state, showQuery = true }) {
         <>
           <Divider />
           <div style={{ display: "grid", gap: "var(--space-3)" }}>
-            {state.group.filters.map(f => (
-              <FilterRow key={f.id} filter={f} fields={state.fields}
+            {state.group.filters.map((f, i) => (
+              <FilterRow key={f.id} filter={f} fields={state.fields} index={i}
                 onChange={patch => state.update(f.id, patch)} onRemove={() => state.remove(f.id)} />
             ))}
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", flexWrap: "wrap" }}>
@@ -328,7 +363,7 @@ export function FilterBar({ state, showQuery = true }) {
               </span>
               {state.group.filters.length > 1 && (
                 <span style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
-                  <span style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)" }}>Match</span>
+                  <span style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)" }}>Set all to</span>
                   <Button size="sm" variant={state.group.combinator === "and" ? "primary" : "ghost"}
                     onClick={() => state.setCombinator("and")}>all</Button>
                   <Button size="sm" variant={state.group.combinator === "or" ? "primary" : "ghost"}
@@ -424,8 +459,13 @@ export function ScopeTabs({ state, scopes = [], counts, variant = "pill" }) {
             {s.icon && <Icon name={s.icon} size={15} />}
             {s.label}
             {counts && counts[s.id] !== undefined && (
+              /* On the pill the count sits ON the solid interactive fill, so it
+                 has to take the on-interactive ink. Reading --interactive there
+                 put dark crimson on crimson. */
               <span style={{ fontSize: "var(--text-2xs)", fontFeatureSettings: "'tnum'",
-                color: on ? "var(--interactive)" : "var(--text-muted)" }}>{counts[s.id]}</span>
+                color: !on ? "var(--text-muted)"
+                  : variant === "pill" ? "var(--text-on-interactive)" : "var(--interactive)"
+              }}>{counts[s.id]}</span>
             )}
           </button>
         );
