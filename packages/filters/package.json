@@ -29,7 +29,8 @@
     }
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   },
   "files": [
     "src",
@@ -38,5 +39,11 @@
   "arh": {
     "distribution": "source-jsx",
     "requiresTranspile": true
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idiot95/rayhanat-design-system.git",
+    "directory": "packages/filters"
+  },
+  "homepage": "https://github.com/idiot95/rayhanat-design-system#readme"
 }

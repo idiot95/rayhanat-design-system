@@ -27,11 +27,18 @@
     }
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   },
   "files": [
     "src",
     "dist",
     "POTX.md"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idiot95/rayhanat-design-system.git",
+    "directory": "packages/slides"
+  },
+  "homepage": "https://github.com/idiot95/rayhanat-design-system#readme"
 }

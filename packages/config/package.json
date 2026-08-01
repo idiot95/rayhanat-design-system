@@ -12,6 +12,13 @@
     "./tsconfig.base.json": "./tsconfig.base.json"
   },
   "publishConfig": {
-    "access": "restricted"
-  }
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idiot95/rayhanat-design-system.git",
+    "directory": "packages/config"
+  },
+  "homepage": "https://github.com/idiot95/rayhanat-design-system#readme"
 }

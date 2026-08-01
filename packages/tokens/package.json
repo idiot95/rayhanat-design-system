@@ -20,12 +20,19 @@
     "./fonts/*": "./fonts/*"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   },
   "types": "./dist/tokens.ts",
   "files": [
     "dist",
     "fonts",
     "brand.json"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idiot95/rayhanat-design-system.git",
+    "directory": "packages/tokens"
+  },
+  "homepage": "https://github.com/idiot95/rayhanat-design-system#readme"
 }

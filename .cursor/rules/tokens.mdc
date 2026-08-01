@@ -1,0 +1,54 @@
+---
+description: Token discipline — semantic CSS variables, never raw values
+globs: **/*.tsx,**/*.jsx,**/*.ts,**/*.js,**/*.css,**/*.scss
+alwaysApply: false
+---
+
+Colour, spacing, type, radius, shadow and motion all come from semantic tokens.
+
+```jsx
+// correct
+<div style={{ color: "var(--text-muted)", background: "var(--surface-sunken)" }} />
+
+// lint error — raw colour literal
+<div style={{ color: "#6b6257" }} />
+// lint error — ramp step; ramps are for the token layer only
+<div style={{ color: "var(--color-sand-600)" }} />
+// lint error — arbitrary Tailwind value
+<div className="p-[13px] text-[#ff0000]" />
+// lint error — raw pixels in a template string
+const s = `${x}px`;
+```
+
+**Surface** `--canvas` `--surface` `--surface-raised` `--surface-sunken`
+`--surface-inverse`
+**Text** `--text-primary` `--text-secondary` `--text-muted` `--text-inverse`
+`--text-on-interactive`
+**Interactive** `--interactive` `--interactive-hover` `--interactive-active`
+`--interactive-solid` `--interactive-solid-hover` `--interactive-subtle`
+`--interactive-subtle-hover` `--secondary` `--secondary-subtle`
+**Status** `--success` `--warning` `--danger` `--info`, each with `-subtle`
+**Border** `--border` `--border-hairline` `--border-control` `--border-thick`
+`--border-strong` `--border-interactive` `--border-focus` `--focus-ring`
+**Radius** `--radius-none|sm|md|lg|xl|full` · **Shadow** `--shadow-sm|md|lg|xl`
+**Z** `--z-base|raised|sticky|dropdown|overlay|modal|popover|tooltip|toast`
+**Motion** `--duration-instant|fast|normal|slow|deliberate`,
+`--ease-standard|emphasized|exit|spring`
+
+**Spacing scale** — `var(--space-N)`; layout components take N directly
+(`<Stack gap={5}>`):
+
+```
+0 → 0    3 → 8px    6 → 20px   9  → 40px   14 → 80px
+px → 1px 4 → 12px   7 → 24px   10 → 48px   16 → 96px
+1 → 2px  5 → 16px   8 → 32px   12 → 64px
+2 → 4px
+```
+
+**Type** `--text-3xs` … `--text-6xl`, each with a matching `--leading-*` step;
+`--weight-regular|medium|semibold`; `--tracking-tight|normal|wide|kicker`;
+`--font-body|display|mono|arabic`. A parallel `--text-ar-*` / `--leading-ar-*`
+scale serves the Arabic face. Never a literal `font-size`.
+
+With Tailwind, the preset maps semantic names to these variables:
+`presets: [require("@al-rayhaanat/tokens/tailwind")]`.

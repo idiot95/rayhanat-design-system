@@ -7,7 +7,7 @@ in this table, and every one of them is real React except `tokens` and `config`.
 | --- | --- | --- |
 | `@al-rayhaanat/tokens` | — | DTCG source and every generated target: CSS vars, TS, Tailwind preset, SCSS, Figma variables, pptx theme, the self-hosted Kanz al-Lulu face. |
 | `@al-rayhaanat/config` | — | ESLint, TypeScript and Prettier config. **Install first** — it is the enforcement mechanism. |
-| `@al-rayhaanat/icons` | tokens | The mark (auto-simplifying by size, never mirrors), Petal, Spinner, 41 Lucide glyphs with mirror flags. |
+| `@al-rayhaanat/icons` | tokens | The mark (auto-simplifying by size, never mirrors), Petal, Spinner, 42 Lucide glyphs with mirror flags. |
 | `@al-rayhaanat/motion` | tokens | Transition, FadeIn, Collapse, Stagger, PageTransition. `prefers-reduced-motion` handled once, here. |
 | `@al-rayhaanat/ui` | tokens, icons | Primitives and layout, `useBreakpoint`, `Truncate`, `OverflowRow`. |
 | `@al-rayhaanat/prose` | tokens, icons, ui | Rich text: callouts, five list markers, steps, quotations, code, footnotes. |

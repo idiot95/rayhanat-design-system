@@ -1,0 +1,75 @@
+---
+description: Component inventory — compose from these before writing anything new
+globs: **/*.tsx,**/*.jsx
+alwaysApply: false
+---
+
+All named exports of `@al-rayhaanat/system`. Compose these before writing a new
+component.
+
+**ui (34)** `Button` `IconButton` `Link` `Badge` `Tag` `Dot` `Avatar`
+`Skeleton` `Card` `Divider` `Label` `Input` `SearchField` `Textarea` `Select`
+`Checkbox` `Radio` `Switch` `Stack` `Cluster` `Grid` `Split` `SidebarLayout`
+`Center` `ScrollArea` `Container` `Spacer` `AspectRatio` `PageShell`
+`BlockDemo` `Truncate` `OverflowRow` `useBreakpoint` `BREAKPOINTS`
+
+**prose (18)** `Prose` `Lede` `ProseHeading` `Callout` `BulletList`
+`NumberedList` `Steps` `DefinitionList` `Blockquote` `PullQuote` `CodeBlock`
+`InlineCode` `Kbd` `Highlight` `FootnoteRef` `Footnotes` `Ornament`
+`RICH_TEXT_BLOCKS`
+
+**patterns (18)** `Modal` `Drawer` `BottomSheet` `ConfirmDialog` `Popover`
+`Tooltip` `Tabs` `Accordion` `Breadcrumb` `Pagination` `CommandPalette`
+`ToastProvider` `useToast` `Toast` `EmptyState` `ErrorState` `LoadingState`
+`AccessDenied`
+
+**filters (13)** `FilteredTable` `FilterBar` `FilterChips` `SavedViews`
+`ScopeTabs` `QuickFilters` `FacetList` `useFilters` `applyFilters`
+`serializeFilters` `parseFilters` `isPresetActive` `OPERATORS`
+
+**slides (12)** `Slide` `SlideCover` `SlideDivider` `SlideContent`
+`SlideBullets` `SlideStats` `SlideChart` `SlideTable` `SlideQuote` `SlideClose`
+`buildDeck` `DECK_RHYTHM`
+
+**forms (11)** `Form` `FormField` `FieldSet` `FormSection` `FormActions`
+`ValidationSummary` `TextField` `TextareaField` `SelectField` `useFieldIds`
+`rhf`
+
+**shell (10)** `AppShell` `MarketingShell` `MobileShell` `FocusShell` `TopBar`
+`SideNav` `MenuBar` `UserMenu` `PageHeader` `Toolbar`
+
+**charts (9)** `LineChart` `AreaChart` `BarChart` `DonutChart` `Sparkline`
+`Stat` `Legend` `SERIES` `CHART_RULES`
+
+**motion (8)** `Transition` `FadeIn` `Collapse` `Stagger` `PageTransition`
+`useReducedMotion` `PRESETS` `MOTION`
+
+**icons (7)** `Mark` `Petal` `Spinner` `Icon` `ICON_NAMES` `ICONS` `MIRRORED`
+
+**table (6)** `DataTable` `ToolbarTable` `TableToolbar` `ColumnOrder`
+`useTableState` `useTableToolbar`
+
+**contracts (2)** `CONTRACTS` `ContractTable`
+
+## Signatures worth knowing
+
+```jsx
+<Button variant="primary|secondary|ghost|danger" size="sm|md|lg"
+        icon="check" iconEnd loading disabled block />
+<Callout tone="note|accent|success|warning|danger|info" variant="bar|card" title="…" />
+<Stack gap={5} align />          // vertical rhythm
+<Cluster gap={3} align justify /> // horizontal, wraps
+<Grid min="240px" gap={5} />      // auto-fit; pass `columns` only when the count means something
+<Split min="320px" gap={6} />     // two-up that collapses on its own
+<Container size="prose|md|lg|full" />
+```
+
+`Grid` and `Split` reflow on content width — most responsive work needs no
+breakpoint. Use `useBreakpoint()` only when the structure itself changes.
+
+Icon names (42): `search` `plus` `minus` `check` `x` `chevron-right`
+`chevron-left` `chevron-down` `chevron-up` `arrow-right` `arrow-left`
+`arrow-up-right` `menu` `sliders` `filter` `user` `users` `mail` `calendar`
+`clock` `file-text` `folder` `book-open` `bookmark` `image` `table` `layers`
+`grid` `download` `upload` `printer` `trash` `pencil` `eye` `lock` `bell`
+`star` `heart` `external-link` `more-horizontal` `settings` `log-out`
