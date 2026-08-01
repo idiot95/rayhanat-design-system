@@ -18,10 +18,10 @@ component.
 `InlineCode` `Kbd` `Highlight` `FootnoteRef` `Footnotes` `Ornament`
 `RICH_TEXT_BLOCKS`
 
-**patterns (18)** `Modal` `Drawer` `BottomSheet` `ConfirmDialog` `Popover`
+**patterns (23)** `Modal` `Drawer` `BottomSheet` `ConfirmDialog` `Popover`
 `Tooltip` `Tabs` `Accordion` `Breadcrumb` `Pagination` `CommandPalette`
 `ToastProvider` `useToast` `Toast` `EmptyState` `ErrorState` `LoadingState`
-`AccessDenied`
+`AccessDenied` `GhostButton` `GhostMenu` `GhostMenuItem` `GhostToolbar` `ExpandingSearch`
 
 **filters (13)** `FilteredTable` `FilterBar` `FilterChips` `SavedViews`
 `ScopeTabs` `QuickFilters` `FacetList` `useFilters` `applyFilters`

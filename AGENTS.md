@@ -13,7 +13,7 @@ The system is not a suggestion layer. Most of the rules below are enforced by
 Import components from `@al-rayhaanat/system`. Never write a raw hex colour, a
 pixel value, or a physical direction (`margin-left`, `left`, `text-align: left`)
 — use semantic CSS variables and logical properties. Never rebuild a component
-that already exists; there are 148 exports and the list is below. Theme and
+that already exists; there are 153 exports and the list is below. Theme and
 direction come from `<html data-theme dir lang>` and nothing else.
 
 ---
@@ -155,10 +155,10 @@ Everything below is a named export of `@al-rayhaanat/system`.
 `CodeBlock` `InlineCode` `Kbd` `Highlight` `FootnoteRef` `Footnotes` `Ornament`
 `RICH_TEXT_BLOCKS`
 
-**Overlays & states** (`patterns`, 18) — `Modal` `Drawer` `BottomSheet`
+**Overlays & states** (`patterns`, 23) — `Modal` `Drawer` `BottomSheet`
 `ConfirmDialog` `Popover` `Tooltip` `Tabs` `Accordion` `Breadcrumb`
 `Pagination` `CommandPalette` `ToastProvider` `useToast` `Toast` `EmptyState`
-`ErrorState` `LoadingState` `AccessDenied`
+`ErrorState` `LoadingState` `AccessDenied` `GhostButton` `GhostMenu` `GhostMenuItem` `GhostToolbar` `ExpandingSearch`
 
 **Filters** (`filters`, 13) — `FilteredTable` `FilterBar` `FilterChips`
 `SavedViews` `ScopeTabs` `QuickFilters` `FacetList` `useFilters` `applyFilters`

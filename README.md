@@ -5,7 +5,7 @@
 # al-Rayhaanat Design System
 
 **Tokens, components and layout for Daeratul Aqeeq products.**
-One install, 148 components, light and dark, Latin and Arabic.
+One install, 153 components, light and dark, Latin and Arabic.
 
 `v1.3.0` · React 18+ · [Token reference](packages/tokens/README.md) · [Package map](packages/README.md) · [For AI agents](AGENTS.md)
 
@@ -125,7 +125,7 @@ Install `@al-rayhaanat/system` and all of this comes from one import:
 | --- | --- | --- |
 | [`ui`](packages/ui) | 34 | Primitives and layout — `Button`, `Card`, `Input`, `Stack`, `Grid`, `Split`, `useBreakpoint` |
 | [`prose`](packages/prose) | 18 | Rich text — `Callout`, `Steps`, `PullQuote`, `CodeBlock`, `Footnotes`, five list markers |
-| [`patterns`](packages/patterns) | 18 | Overlays and states — `Modal`, `Drawer`, `Toast`, `CommandPalette`, `EmptyState`, `ErrorState` |
+| [`patterns`](packages/patterns) | 23 | Overlays, states and the ghost toolbar controls — `Modal`, `Drawer`, `Toast`, `CommandPalette`, `GhostButton`, `ExpandingSearch` |
 | [`filters`](packages/filters) | 13 | Declared and dynamic filters with the URL as state — `FilteredTable`, `FilterBar`, `SavedViews` |
 | [`slides`](packages/slides) | 12 | Deck layouts plus `buildDeck()` for pptxgenjs |
 | [`forms`](packages/forms) | 11 | `FormField` and the aria wiring; optional React Hook Form adapter |

@@ -18,7 +18,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from "react";
 import { Icon, Mark, Spinner } from "@al-rayhaanat/icons";
 import { Button, IconButton, Card, Input, Divider, Badge } from "@al-rayhaanat/ui";
-import { Transition, FadeIn } from "@al-rayhaanat/motion";
+import { Transition, FadeIn, useReducedMotion } from "@al-rayhaanat/motion";
 
 /* ── behaviour shared by every overlay ──────────────────────────────────── */
 const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -601,5 +601,267 @@ export function AccessDenied({ resource = "this area", contact = "your administr
       </div>
       <Button size="sm" variant="secondary" icon="mail">Request access</Button>
     </div>
+  );
+}
+
+/* ══ ghost controls ════════════════════════════════════════════════════════
+   A toolbar sits above content, so its controls must not compete with it. The
+   ghost treatment carries that: no fill and no border at rest, tone only once
+   the control is doing something. Colour is therefore *state*, not decoration —
+   a tinted control means a filter is applied, a sort is set, a query is live.
+
+   Motion is the same argument. The search does not appear beside its icon; the
+   icon becomes the field, so the widening is what tells you where the caret
+   went. Under prefers-reduced-motion the same states resolve instantly.        */
+
+const GHOST_TONES = {
+  accent: { ink: "var(--interactive)", tint: "var(--interactive-subtle)",
+    hover: "var(--interactive-subtle-hover)", dot: "var(--interactive-solid)" },
+  success: { ink: "var(--success)", tint: "var(--success-subtle)",
+    hover: "var(--success-subtle)", dot: "var(--success)" },
+  warning: { ink: "var(--warning)", tint: "var(--warning-subtle)",
+    hover: "var(--warning-subtle)", dot: "var(--warning)" },
+  danger: { ink: "var(--danger)", tint: "var(--danger-subtle)",
+    hover: "var(--danger-subtle)", dot: "var(--danger)" },
+  info: { ink: "var(--info)", tint: "var(--info-subtle)",
+    hover: "var(--info-subtle)", dot: "var(--info)" },
+  neutral: { ink: "var(--text-secondary)", tint: "var(--surface-sunken)",
+    hover: "var(--surface-sunken)", dot: "var(--text-muted)" }
+};
+
+const GHOST_SIZES = { sm: { box: 28, icon: 15 }, md: { box: 36, icon: 16 }, lg: { box: 44, icon: 18 } };
+
+/** Named durations, resolved to numbers so a transition can be zeroed. */
+const GHOST_MS = { instant: 0, fast: 120, normal: 200, slow: 320 };
+
+/**
+ * A ghost icon control. `tone` colours it only while it is active or hovered —
+ * at rest it is a bare glyph, so a row of them reads as one quiet group.
+ *
+ * `active` means the control is *doing* something (a filter applied, a sort
+ * set). It tints the control and raises a dot, because tone alone is not enough
+ * on its own: the dot is the redundant channel the contracts require.
+ *
+ * `count` is announced with the label rather than drawn as a number, so the
+ * control keeps its square footprint and a row of them never reflows.
+ */
+export function GhostButton({
+  icon, label, tone = "accent", active, count, expanded, size = "md",
+  hint = true, disabled, onClick, style, ...rest
+}) {
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const t = GHOST_TONES[tone] || GHOST_TONES.accent;
+  const dim = GHOST_SIZES[size] || GHOST_SIZES.md;
+  const lit = active || expanded;
+  const show = (hover || focus) && hint && !expanded;
+
+  return (
+    <span style={{ position: "relative", display: "inline-flex" }}>
+      <IconButton
+        name={icon}
+        label={count === undefined || count === null ? label : `${label}, ${count} applied`}
+        variant="ghost"
+        size={size}
+        disabled={disabled}
+        aria-expanded={expanded === undefined ? undefined : !!expanded}
+        aria-pressed={expanded === undefined && active !== undefined ? !!active : undefined}
+        onClick={onClick}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        style={{
+          color: lit || hover ? t.ink : "var(--text-secondary)",
+          background: lit ? t.tint : hover ? t.hover : "transparent",
+          transitionProperty: "background-color, color",
+          transitionDuration: "var(--duration-fast)",
+          transitionTimingFunction: "var(--ease-standard)",
+          ...style
+        }}
+        {...rest}
+      />
+      {active && (
+        <span aria-hidden="true" style={{ position: "absolute", insetBlockStart: 3,
+          insetInlineEnd: 3, inlineSize: 6, blockSize: 6, borderRadius: "var(--radius-full)",
+          background: t.dot, pointerEvents: "none" }} />
+      )}
+      {show && (
+        <span role="tooltip" style={{ position: "absolute", insetBlockStart: "calc(100% + var(--space-2))",
+          insetInlineStart: "50%", transform: "translateX(-50%)", whiteSpace: "nowrap",
+          zIndex: "var(--z-tooltip)", fontSize: "var(--text-3xs)", pointerEvents: "none",
+          paddingInline: "var(--space-3)", paddingBlock: "var(--space-1)",
+          background: "var(--surface-raised)", color: "var(--text-primary)",
+          borderRadius: "var(--radius-sm)", boxShadow: "var(--shadow-md)",
+          borderWidth: "var(--border-hairline)", borderStyle: "solid", borderColor: "var(--border)" }}>
+          {label}{count ? ` · ${count}` : ""}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/**
+ * The search that becomes its own field. Pressing the glyph widens it in place
+ * and moves the caret into it; Escape clears and closes; leaving it empty
+ * collapses it again, so an unused search never holds the width it borrowed.
+ *
+ * Uncontrolled by default. Pass `open` and `onOpenChange` to drive it, which is
+ * what a toolbar does when only one control may be open at a time.
+ */
+export function ExpandingSearch({
+  value = "", onChange, placeholder = "Search", tone = "accent", size = "md",
+  width = 220, open: openProp, onOpenChange, autoCollapse = true, label = "Search",
+  style, ...rest
+}) {
+  const reduced = useReducedMotion();
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = openProp === undefined ? ownOpen : openProp;
+  const setOpen = useCallback(next => {
+    if (openProp === undefined) setOwnOpen(next);
+    if (onOpenChange) onOpenChange(next);
+  }, [openProp, onOpenChange]);
+
+  const input = useRef(null);
+  const t = GHOST_TONES[tone] || GHOST_TONES.accent;
+  const dim = GHOST_SIZES[size] || GHOST_SIZES.md;
+  const ms = reduced ? 0 : GHOST_MS.normal;
+
+  /* Focus follows the widening rather than waiting for it: the caret should be
+     live before the field finishes arriving. */
+  useEffect(() => { if (open && input.current) input.current.focus(); }, [open]);
+
+  const close = useCallback(clear => {
+    if (clear && onChange) onChange("");
+    setOpen(false);
+  }, [onChange, setOpen]);
+
+  return (
+    <span
+      style={{
+        position: "relative", display: "inline-flex", alignItems: "center",
+        inlineSize: open ? width : dim.box, blockSize: dim.box, maxInlineSize: "100%",
+        transitionProperty: "inline-size, background-color, border-color",
+        transitionDuration: `${ms}ms`,
+        transitionTimingFunction: "var(--ease-emphasized)",
+        borderRadius: "var(--radius-full)", overflow: "hidden",
+        background: open ? "var(--surface-sunken)" : "transparent",
+        borderWidth: "var(--border-hairline)", borderStyle: "solid",
+        borderColor: open ? "var(--border-control)" : "transparent",
+        ...style
+      }}
+      {...rest}
+    >
+      <button
+        type="button"
+        aria-label={label}
+        aria-expanded={open}
+        onClick={() => (open ? close(true) : setOpen(true))}
+        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center",
+          inlineSize: dim.box, blockSize: dim.box, flex: "none", background: "transparent",
+          border: 0, cursor: "pointer", borderRadius: "var(--radius-full)",
+          color: open || value ? t.ink : "var(--text-secondary)",
+          transitionProperty: "color", transitionDuration: "var(--duration-fast)" }}
+      >
+        <Icon name="search" size={dim.icon} />
+      </button>
+
+      <input
+        ref={input}
+        type="search"
+        value={value}
+        placeholder={placeholder}
+        tabIndex={open ? 0 : -1}
+        aria-hidden={open ? undefined : true}
+        onChange={e => onChange && onChange(e.target.value)}
+        onKeyDown={e => { if (e.key === "Escape") { e.stopPropagation(); close(true); } }}
+        onBlur={() => { if (autoCollapse && !value) close(false); }}
+        style={{ flex: 1, minInlineSize: 0, background: "transparent", border: 0,
+          outline: "none", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
+          color: "var(--text-primary)", paddingInlineEnd: "var(--space-4)",
+          opacity: open ? 1 : 0,
+          transitionProperty: "opacity", transitionDuration: `${ms}ms`,
+          transitionTimingFunction: "var(--ease-standard)" }}
+      />
+    </span>
+  );
+}
+
+/**
+ * A ghost control that opens a small panel — the shape `filter` and `sort` take.
+ * Dismisses on outside click and on Escape, and returns focus to its trigger,
+ * because a menu that strands the keyboard is worse than no menu.
+ */
+export function GhostMenu({
+  icon, label, tone = "accent", active, count, size = "md",
+  open: openProp, onOpenChange, align = "end", width = 220, children, style
+}) {
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = openProp === undefined ? ownOpen : openProp;
+  const setOpen = useCallback(next => {
+    if (openProp === undefined) setOwnOpen(next);
+    if (onOpenChange) onOpenChange(next);
+  }, [openProp, onOpenChange]);
+  const wrap = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = e => { if (wrap.current && !wrap.current.contains(e.target)) setOpen(false); };
+    const onKey = e => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      const trigger = wrap.current && wrap.current.querySelector("button");
+      if (trigger) trigger.focus();
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [open, setOpen]);
+
+  return (
+    <span ref={wrap} style={{ position: "relative", display: "inline-flex", ...style }}>
+      <GhostButton icon={icon} label={label} tone={tone} active={active} count={count}
+        size={size} expanded={open} onClick={() => setOpen(!open)} />
+      <Transition show={open} preset="fade-down" duration="fast">
+        <div role="menu" style={{ position: "absolute", insetBlockStart: "calc(100% + var(--space-2))",
+          [align === "start" ? "insetInlineStart" : "insetInlineEnd"]: 0, minInlineSize: width,
+          zIndex: "var(--z-popover)", background: "var(--surface-raised)",
+          borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-lg)",
+          borderWidth: "var(--border-hairline)", borderStyle: "solid", borderColor: "var(--border)",
+          padding: "var(--space-3)", display: "grid", gap: "var(--space-1)" }}>
+          {children}
+        </div>
+      </Transition>
+    </span>
+  );
+}
+
+/** A row of ghost controls. Only one may be open at a time. */
+export function GhostToolbar({ children, gap = 2, style }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: `var(--space-${gap})`,
+      flexWrap: "wrap", minInlineSize: 0, ...style }}>
+      {children}
+    </div>
+  );
+}
+
+/** A row inside a GhostMenu — the shape sort and filter options both take. */
+export function GhostMenuItem({ label, selected, icon, onClick, role = "menuitemradio" }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button type="button" role={role} aria-checked={role === "menuitem" ? undefined : !!selected}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", inlineSize: "100%",
+        minBlockSize: 32, border: 0, cursor: "pointer", textAlign: "start",
+        borderRadius: "var(--radius-sm)", paddingInline: "var(--space-3)",
+        fontFamily: "var(--font-body)", fontSize: "var(--text-xs)",
+        background: selected ? "var(--interactive-subtle)" : hover ? "var(--surface-sunken)" : "transparent",
+        color: selected ? "var(--interactive)" : "var(--text-primary)" }}>
+      {icon && <Icon name={icon} size={14} />}
+      <span style={{ marginInlineEnd: "auto" }}>{label}</span>
+      {selected && <Icon name="check" size={14} />}
+    </button>
   );
 }

@@ -61,7 +61,7 @@ export function Mark({ size = 24, tone = "brand", shape, color = "var(--interact
     : { fill: layers ? layers[i] : "currentColor", fillOpacity: layers ? 1 : opacity[i] };
   return (
     <svg viewBox={form === "full" ? FULL_BOX : SIMPLE_BOX} aria-hidden="true"
-      style={{ width: size, height: size, color, display: "block", ...style }} {...rest}>
+      style={{ width: size, height: size, color, display: "block", pointerEvents: "none", ...style }} {...rest}>
       {form === "full" && <g {...paint(0)}>{OUTER.map((d, i) => <path key={i} d={d} />)}</g>}
       {form !== "core" && <g {...paint(1)}>{INNER.map((d, i) => <path key={i} d={d} />)}</g>}
       <circle cx="1000.05" cy="1029.79" r={form === "full" ? 212.56 : form === "simple" ? 300 : 500} {...paint(2)} />
@@ -77,7 +77,8 @@ export function Petal({ size = 16, rotate = 0, opacity = 1, style }) {
   const width = typeof size === "number" ? size * 0.52 : `calc(${size} * 0.52)`;
   return (
     <svg viewBox="826 238 348 672" aria-hidden="true"
-      style={{ width, height: size, display: "block", transform: `rotate(${rotate}deg)`, opacity, ...style }}>
+      style={{ width, height: size, display: "block", pointerEvents: "none",
+        transform: `rotate(${rotate}deg)`, opacity, ...style }}>
       <path d={PETAL} fill="currentColor" />
     </svg>
   );
@@ -153,6 +154,14 @@ export const ICONS = GLYPHS;
 
 /**
  * A Lucide glyph. `aria-hidden` by default; pass `label` to make it semantic.
+ *
+ * `pointer-events: none` is load-bearing, not tidiness. The glyph is drawn with
+ * dangerouslySetInnerHTML, so every re-render replaces its <path> nodes — and a
+ * button re-renders on mousedown to paint its active state. Press exactly on a
+ * stroke and the path you pressed is gone before mouseup, leaving the browser no
+ * common ancestor for the two events and firing NO click at all. Taking the glyph
+ * out of hit testing keeps the <button> the target for both, so the press always
+ * lands. Decorative marks should never be hit targets anyway.
  * Directional glyphs flip under `dir="rtl"` unless `mirror={false}`.
  * `size` should come from the token scale — 16 beside 13–14px text, 20 in
  * buttons, 24 standalone; above 24 drop strokeWidth to 1.25.
@@ -163,7 +172,7 @@ export function Icon({ name = "search", size = 20, strokeWidth = 1.5, label, mir
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth}
       strokeLinecap="round" strokeLinejoin="round"
       role={label ? "img" : undefined} aria-label={label} aria-hidden={label ? undefined : "true"}
-      style={{ width: size, height: size, display: "block", flex: "none",
+      style={{ width: size, height: size, display: "block", flex: "none", pointerEvents: "none",
         ...(flips ? { transform: "scaleX(var(--icon-flip, 1))" } : null), ...style }}
       dangerouslySetInnerHTML={{ __html: GLYPHS[name] || "" }} {...rest} />
   );

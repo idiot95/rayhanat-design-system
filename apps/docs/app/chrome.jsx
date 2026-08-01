@@ -47,7 +47,7 @@ export function Chrome({ children }) {
             footer={
               <span style={{ paddingInline: "var(--space-4)", fontSize: "var(--text-3xs)",
                 color: "var(--text-muted)" }}>
-                v1.3.0 · 148 components
+                v1.3.0 · 153 components
               </span>
             }
           />

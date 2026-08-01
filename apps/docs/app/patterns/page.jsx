@@ -5,9 +5,93 @@ import {
   Modal, Drawer, BottomSheet, ConfirmDialog, Popover, Tooltip, Tabs, Accordion,
   Breadcrumb, Pagination, CommandPalette, useToast, Toast,
   EmptyState, ErrorState, LoadingState, AccessDenied,
-  Button, Stack, Cluster, Grid, Badge, Prose
+  GhostButton, GhostMenu, GhostMenuItem, GhostToolbar, ExpandingSearch,
+  Button, Stack, Cluster, Grid, Badge, Prose, Divider
 } from "@al-rayhaanat/system";
 import { Page, Group, Demo } from "../../components/demo.jsx";
+
+const SORTS = [
+  { key: "ref", label: "Reference" },
+  { key: "chapter", label: "Chapter" },
+  { key: "folios", label: "Folios" },
+  { key: "updated", label: "Last updated" }
+];
+
+const CHAPTERS = ["Bindery", "Endpaper", "Colophon", "Proof"];
+
+/** ExpandingSearch owns its open state, never the query — so the caller holds it. */
+function SelfSearch({ size }) {
+  const [q, setQ] = useState("");
+  return (
+    <Cluster gap={3} align="center">
+      <ExpandingSearch size={size} value={q} onChange={setQ} placeholder={`Search — ${size}`} />
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)",
+        color: "var(--text-muted)" }}>{q || "—"}</span>
+    </Cluster>
+  );
+}
+
+/** The three controls as a product actually wires them: one open at a time. */
+function GhostBar() {
+  const [openControl, setOpenControl] = useState(null);
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState(null);
+  const [chapters, setChapters] = useState([]);
+
+  const only = name => next => setOpenControl(next ? name : null);
+  const toggleChapter = c =>
+    setChapters(cs => (cs.includes(c) ? cs.filter(x => x !== c) : [...cs, c]));
+
+  return (
+    <Stack gap={4}>
+      <GhostToolbar>
+        <ExpandingSearch
+          value={query}
+          onChange={setQuery}
+          placeholder="Search plates"
+          open={openControl === "search"}
+          onOpenChange={only("search")}
+        />
+        <GhostMenu
+          icon="sliders"
+          label="Sort"
+          tone="accent"
+          active={!!sort}
+          count={sort ? 1 : 0}
+          open={openControl === "sort"}
+          onOpenChange={only("sort")}
+        >
+          {SORTS.map(s => (
+            <GhostMenuItem key={s.key} label={s.label} selected={sort === s.key}
+              onClick={() => setSort(sort === s.key ? null : s.key)} />
+          ))}
+        </GhostMenu>
+        <GhostMenu
+          icon="filter"
+          label="Filter"
+          tone="success"
+          active={chapters.length > 0}
+          count={chapters.length}
+          open={openControl === "filter"}
+          onOpenChange={only("filter")}
+        >
+          {CHAPTERS.map(c => (
+            <GhostMenuItem key={c} label={c} selected={chapters.includes(c)}
+              role="menuitemcheckbox" onClick={() => toggleChapter(c)} />
+          ))}
+        </GhostMenu>
+      </GhostToolbar>
+
+      <Cluster gap={3}>
+        <Badge tone={query ? "accent" : "neutral"}>query: {query || "—"}</Badge>
+        <Badge tone={sort ? "accent" : "neutral"}>sort: {sort || "—"}</Badge>
+        <Badge tone={chapters.length ? "success" : "neutral"}>
+          filter: {chapters.length ? chapters.join(", ") : "—"}
+        </Badge>
+      </Cluster>
+    </Stack>
+  );
+}
 
 const COMMANDS = [
   { label: "New record", icon: "plus", group: "Create", shortcut: "⌘N", run: () => {} },
@@ -27,7 +111,7 @@ export default function PatternsPage() {
     <Page
       title="patterns"
       description="Overlays, disclosure, toasts and the four screen states. Every overlay traps focus, closes on Escape and returns focus to its trigger."
-      meta={<Badge tone="accent">18 exports</Badge>}
+      meta={<Badge tone="accent">23 exports</Badge>}
     >
       <Group title="Overlays">
         <Demo name="Modal · Drawer · BottomSheet · ConfirmDialog · CommandPalette" note="Open one, then press Tab and Escape. The scroll behind is locked and focus comes back to the button you pressed.">
@@ -93,6 +177,74 @@ export default function PatternsPage() {
         />
 
         <CommandPalette open={open === "palette"} onClose={close} commands={COMMANDS} />
+      </Group>
+
+      <Group title="Ghost controls">
+        <Demo name="GhostToolbar · ExpandingSearch · GhostMenu" note="Press the magnifier: the glyph becomes the field rather than a field appearing beside it, so the widening is what tells you where the caret went. Escape clears and closes; leaving it empty collapses it again.">
+          <GhostBar />
+        </Demo>
+
+        <Demo name="GhostButton" note="No fill and no border at rest, so a row of them reads as one quiet group. Hover or focus any of them.">
+          <Stack gap={5}>
+            <Cluster gap={2}>
+              {["search", "sliders", "filter", "download", "printer", "settings"].map(i => (
+                <GhostButton key={i} icon={i} label={i} />
+              ))}
+            </Cluster>
+            <Divider label="tones, active" />
+            <Cluster gap={4}>
+              {[
+                ["accent", "filter", "Filter", 3],
+                ["success", "check", "Approved", 12],
+                ["warning", "bell", "Needs review", 2],
+                ["danger", "trash", "Flagged", 1],
+                ["info", "file-text", "Drafts", 5],
+                ["neutral", "eye", "Watched", 8]
+              ].map(([tone, icon, label, count]) => (
+                <Stack key={tone} gap={2} align="center">
+                  <GhostButton icon={icon} label={label} tone={tone} active count={count} />
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-3xs)",
+                    color: "var(--text-muted)" }}>{tone}</span>
+                </Stack>
+              ))}
+            </Cluster>
+            <Divider label="sizes" />
+            <Cluster gap={4} align="center">
+              {["sm", "md", "lg"].map(s => (
+                <GhostButton key={s} icon="filter" label={`Filter ${s}`} size={s} active />
+              ))}
+            </Cluster>
+          </Stack>
+        </Demo>
+
+        <Demo name="Colour is state, not decoration" note="A tinted control means something is applied — so it is never used to brand a toolbar. The dot is the redundant channel, because tone alone cannot carry meaning.">
+          <Cluster gap={7}>
+            <Stack gap={2} align="center">
+              <GhostButton icon="filter" label="Filter" />
+              <span style={{ fontSize: "var(--text-2xs)", color: "var(--text-muted)" }}>at rest</span>
+            </Stack>
+            <Stack gap={2} align="center">
+              <GhostButton icon="filter" label="Filter" active count={3} />
+              <span style={{ fontSize: "var(--text-2xs)", color: "var(--text-muted)" }}>3 applied</span>
+            </Stack>
+            <Stack gap={2} align="center">
+              <GhostButton icon="filter" label="Filter" disabled />
+              <span style={{ fontSize: "var(--text-2xs)", color: "var(--text-muted)" }}>disabled</span>
+            </Stack>
+          </Cluster>
+        </Demo>
+
+        <Demo name="ExpandingSearch, standalone" note="It owns its open state; the query stays yours. Widths and sizes come off the same scale as the buttons beside it.">
+          <Stack gap={5}>
+            {["sm", "md", "lg"].map(s => (
+              <Cluster key={s} gap={4} align="center">
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-2xs)",
+                  color: "var(--text-muted)", inlineSize: 28 }}>{s}</span>
+                <SelfSearch size={s} />
+              </Cluster>
+            ))}
+          </Stack>
+        </Demo>
       </Group>
 
       <Group title="Disclosure">

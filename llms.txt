@@ -1,7 +1,7 @@
 # al-Rayhaanat Design System
 
 > Tokens, components and layout for Daeratul Aqeeq products. v1.3.0, React 18+.
-> 148 components across 14 packages, one umbrella install. Light and dark,
+> 153 components across 14 packages, one umbrella install. Light and dark,
 > Latin and Arabic, LTR and RTL. Distributed as source JSX on GitHub Packages.
 
 This file is a flat index designed to be pasted into a context window whole. For
@@ -45,7 +45,7 @@ prose       18  Rich text. Depends on tokens, icons, ui.
 contracts   2   Required behaviour as data, plus the minimum test suite. Depends on tokens, icons, ui.
 table       6   One headless core, many presentations. Depends on tokens, icons, ui.
 filters     13  Declared and dynamic filters with the URL as state. Depends on tokens, icons, ui, table.
-patterns    18  Overlays, disclosure, toasts, the four screen states. Depends on tokens, icons, ui, motion.
+patterns    23  Overlays, disclosure, toasts, ghost controls, the four screen states. Depends on tokens, icons, ui, motion.
 forms       11  FormField and the aria wiring. Depends on tokens, icons, ui.
 shell       10  Four app frames and navigation. Depends on tokens, icons, ui, motion, patterns.
 charts      9   Line, area, bar, donut, sparkline, KPI stat. Depends on tokens, icons, ui.
@@ -70,7 +70,8 @@ FootnoteRef Footnotes Ornament RICH_TEXT_BLOCKS
 
 patterns: Modal Drawer BottomSheet ConfirmDialog Popover Tooltip Tabs Accordion
 Breadcrumb Pagination CommandPalette ToastProvider useToast Toast EmptyState
-ErrorState LoadingState AccessDenied
+ErrorState LoadingState AccessDenied GhostButton GhostMenu GhostMenuItem
+GhostToolbar ExpandingSearch
 
 filters: FilteredTable FilterBar FilterChips SavedViews ScopeTabs QuickFilters
 FacetList useFilters applyFilters serializeFilters parseFilters isPresetActive

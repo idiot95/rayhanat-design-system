@@ -14,7 +14,7 @@ in this table, and every one of them is real React except `tokens` and `config`.
 | `@al-rayhaanat/contracts` | tokens, icons, ui | The behaviour every family owes its caller, as data, plus the minimum test suite. |
 | `@al-rayhaanat/table` | tokens, icons, ui | One headless core, many presentations. |
 | `@al-rayhaanat/filters` | tokens, icons, ui, table | Declared and dynamic filters with the URL as state. |
-| `@al-rayhaanat/patterns` | tokens, icons, ui, motion | Overlays, disclosure, toasts, the four screen states. |
+| `@al-rayhaanat/patterns` | tokens, icons, ui, motion | Overlays, disclosure, toasts, ghost toolbar controls, the four screen states. |
 | `@al-rayhaanat/forms` | tokens, icons, ui | FormField and the aria wiring; optional React Hook Form adapter. |
 | `@al-rayhaanat/shell` | tokens, icons, ui, motion, patterns | Four frames, multi-level navigation, menus. |
 | `@al-rayhaanat/charts` | tokens, icons, ui | Line, area, bar, donut, sparkline, KPI stat. |
