@@ -244,16 +244,22 @@ export function SideNav({ groups = [], current, collapsed, onToggleCollapsed, fo
       background: "var(--surface-sunken)", borderInlineEnd: "var(--border-hairline) solid var(--border)",
       display: "grid", gridTemplateRows: "auto minmax(0,1fr) auto", gap: "var(--space-5)",
       paddingBlock: "var(--space-5)", overflow: "hidden", ...style }} {...rest}>
-      <div style={{ display: brand === false ? "none" : "flex", alignItems: "center",
+      <div style={{ display: brand === false && !onToggleCollapsed ? "none" : "flex",
+        alignItems: "center",
         gap: "var(--space-3)", justifyContent: collapsed ? "center" : undefined,
         paddingInline: collapsed ? 0 : "var(--space-4)" }}>
-        <Mark size={22} />
+        {/* Collapsed, the rail is 64px and the toggle takes the mark's place —
+            rendering only the mark there left no way back out, which made
+            collapsing a one-way door. */}
+        {(!collapsed || !onToggleCollapsed) && <Mark size={22} />}
         {!collapsed && (
           <span style={{ fontFamily: "var(--font-display)", fontWeight: "var(--weight-semibold)",
             fontSize: "var(--text-md)", whiteSpace: "nowrap", marginInlineEnd: "auto" }}>{brand}</span>
         )}
-        {onToggleCollapsed && !collapsed && (
-          <IconButton size="sm" variant="ghost" name="menu" label="Collapse navigation"
+        {onToggleCollapsed && (
+          <IconButton size="sm" variant="ghost" name="menu"
+            label={collapsed ? "Expand navigation" : "Collapse navigation"}
+            aria-expanded={!collapsed}
             onClick={onToggleCollapsed} />
         )}
       </div>
@@ -351,11 +357,12 @@ export function SideNav({ groups = [], current, collapsed, onToggleCollapsed, fo
         ))}
       </nav>
 
+      {/* The expand control used to live here, so collapsing moved it from the
+          top of the rail to the bottom and it read as gone. It is in the header
+          now, in one place, whichever state the rail is in. */}
       <div style={{ paddingInline: collapsed ? 0 : "var(--space-4)",
         display: collapsed ? "grid" : undefined, justifyItems: collapsed ? "center" : undefined }}>
-        {collapsed && onToggleCollapsed
-          ? <IconButton size="sm" variant="ghost" name="chevron-right" label="Expand navigation" onClick={onToggleCollapsed} />
-          : footer}
+        {footer}
       </div>
     </aside>
   );

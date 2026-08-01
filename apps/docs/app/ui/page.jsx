@@ -24,7 +24,7 @@ export default function UiPage() {
     <Page
       title="ui"
       description="Primitives and layout. Everything else in the system is built on these."
-      meta={<Badge tone="accent">34 exports</Badge>}
+      meta={<Badge tone="accent">35 exports</Badge>}
     >
       <Group title="Actions">
         <Demo name="Button" note='variant: primary | secondary | ghost | danger · size: sm | md | lg'>

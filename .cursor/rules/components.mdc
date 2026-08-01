@@ -7,11 +7,12 @@ alwaysApply: false
 All named exports of `@al-rayhaanat/system`. Compose these before writing a new
 component.
 
-**ui (34)** `Button` `IconButton` `Link` `Badge` `Tag` `Dot` `Avatar`
+**ui (35)** `Button` `IconButton` `Link` `Badge` `Tag` `Dot` `Avatar`
 `Skeleton` `Card` `Divider` `Label` `Input` `SearchField` `Textarea` `Select`
 `Checkbox` `Radio` `Switch` `Stack` `Cluster` `Grid` `Split` `SidebarLayout`
 `Center` `ScrollArea` `Container` `Spacer` `AspectRatio` `PageShell`
 `BlockDemo` `Truncate` `OverflowRow` `useBreakpoint` `BREAKPOINTS`
+`useTabIndicator`
 
 **prose (18)** `Prose` `Lede` `ProseHeading` `Callout` `BulletList`
 `NumberedList` `Steps` `DefinitionList` `Blockquote` `PullQuote` `CodeBlock`

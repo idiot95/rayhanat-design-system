@@ -15,7 +15,7 @@ export const SECTIONS = [
   {
     label: "Packages",
     items: [
-      { label: "ui", href: "/ui", icon: "grid", count: 34 },
+      { label: "ui", href: "/ui", icon: "grid", count: 35 },
       { label: "prose", href: "/prose", icon: "file-text", count: 18 },
       { label: "patterns", href: "/patterns", icon: "layers", count: 23 },
       { label: "filters", href: "/filters", icon: "filter", count: 13 },

@@ -17,7 +17,7 @@
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Icon } from "@al-rayhaanat/icons";
-import { Button, IconButton, Input, Select, Checkbox, Tag, Card, Divider } from "@al-rayhaanat/ui";
+import { Button, IconButton, Input, Select, Checkbox, Tag, Card, Divider, useTabIndicator } from "@al-rayhaanat/ui";
 import { DataTable } from "@al-rayhaanat/table";
 
 /* ── operators, by field type ───────────────────────────────────────────── */
@@ -387,40 +387,39 @@ export function isPresetActive(state, preset) {
 /** Mutually exclusive scopes, rendered as tabs. `counts` is optional. */
 export function ScopeTabs({ state, scopes = [], counts, variant = "pill" }) {
   const activeId = (scopes.find(s => isPresetActive(state, s)) || {}).id;
+  const [list, indicator] = useTabIndicator(activeId, variant);
   return (
-    <div role="tablist" style={{ display: "flex", flexWrap: "wrap",
+    <div role="tablist" ref={list} style={{ position: "relative", display: "flex", flexWrap: "wrap",
       gap: variant === "pill" ? "var(--space-2)" : "var(--space-5)",
       padding: variant === "pill" ? "var(--space-1)" : 0,
       inlineSize: variant === "pill" ? "fit-content" : undefined, maxInlineSize: "100%",
       borderRadius: variant === "pill" ? "var(--radius-full)" : 0,
       background: variant === "pill" ? "var(--surface-sunken)" : "transparent",
       borderBlockEnd: variant === "pill" ? "none" : "var(--border-hairline) solid var(--border)" }}>
+      {indicator}
       {scopes.map(s => {
         const on = s.id === activeId;
         return (
           <button key={s.id} role="tab" aria-selected={on} onClick={() => state.replace(s)}
             style={variant === "pill" ? {
+              position: "relative", zIndex: 1,
               display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
-              border: 0, cursor: "pointer", minBlockSize: 32,
+              border: 0, cursor: "pointer", minBlockSize: 32, background: "transparent",
               paddingInline: "var(--space-4)", paddingBlock: "var(--space-2)",
               borderRadius: "var(--radius-full)",
               fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
               fontWeight: on ? "var(--weight-medium)" : "var(--weight-regular)",
               color: on ? "var(--text-on-interactive)" : "var(--text-secondary)",
-              background: on ? "var(--interactive-solid)" : "transparent",
-              boxShadow: on ? "var(--shadow-sm)" : "none",
-              transitionProperty: "background-color, color",
-              transitionDuration: "var(--duration-fast)"
+              transitionProperty: "color", transitionDuration: "var(--duration-fast)"
             } : {
+              position: "relative", zIndex: 1,
               display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
               background: "transparent", border: 0, cursor: "pointer",
               paddingBlock: "0 var(--space-3)", paddingInline: 0,
-              marginBlockEnd: "calc(var(--border-hairline) * -1)",
-              transitionProperty: "color, border-color", transitionDuration: "var(--duration-fast)",
+              transitionProperty: "color", transitionDuration: "var(--duration-fast)",
               fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
               fontWeight: on ? "var(--weight-medium)" : "var(--weight-regular)",
-              color: on ? "var(--interactive)" : "var(--text-secondary)",
-              borderBlockEnd: `var(--border-thick) solid ${on ? "var(--interactive-solid)" : "transparent"}`
+              color: on ? "var(--interactive)" : "var(--text-secondary)"
             }}>
             {s.icon && <Icon name={s.icon} size={15} />}
             {s.label}
@@ -534,18 +533,21 @@ export function FilteredTable({
       {scopes && <ScopeTabs state={state} scopes={scopes} counts={scopeCounts} />}
       {presets && <QuickFilters state={state} presets={presets} counts={presetCounts} />}
       <FilterBar state={state} />
+      {/* The count sits above BOTH columns. Inside the table column it pushed the
+          table down by its own height, so the facet rail — which starts at the top
+          of the row — no longer lined up with the table beside it. */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-3)" }}>
+        <span style={{ fontSize: "var(--text-xs)", color: "var(--text-secondary)", fontFeatureSettings: "'tnum'" }}>
+          {filtered.length} of {rows.length} records
+        </span>
+        {filtered.length === 0 && rows.length > 0 && (
+          <Button size="sm" variant="ghost" onClick={state.clear}>Clear filters</Button>
+        )}
+      </div>
       <div style={{ display: "grid",
         gridTemplateColumns: facets ? "minmax(0,1fr) 200px" : "minmax(0,1fr)",
         gap: "var(--space-6)", alignItems: "start" }}>
-        <div style={{ display: "grid", gap: "var(--space-3)", minInlineSize: 0 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-3)" }}>
-            <span style={{ fontSize: "var(--text-xs)", color: "var(--text-secondary)", fontFeatureSettings: "'tnum'" }}>
-              {filtered.length} of {rows.length} records
-            </span>
-            {filtered.length === 0 && rows.length > 0 && (
-              <Button size="sm" variant="ghost" onClick={state.clear}>Clear filters</Button>
-            )}
-          </div>
+        <div style={{ minInlineSize: 0 }}>
           <DataTable columns={columns} rows={filtered} {...tableProps} />
         </div>
         {facets && (

@@ -41,14 +41,14 @@ const COLUMNS = [
 
 const SCOPES = [
   { id: "all", label: "All", filters: [] },
-  { id: "open", label: "Open", filters: [{ key: "state", op: "is", value: "open" }] },
-  { id: "review", label: "In review", filters: [{ key: "state", op: "is", value: "review" }] },
-  { id: "closed", label: "Closed", filters: [{ key: "state", op: "is", value: "closed" }] }
+  { id: "open", label: "Open", filters: [{ field: "state", operator: "is", value: "open" }] },
+  { id: "review", label: "In review", filters: [{ field: "state", operator: "is", value: "review" }] },
+  { id: "closed", label: "Closed", filters: [{ field: "state", operator: "is", value: "closed" }] }
 ];
 
 const PRESETS = [
-  { id: "bindery", label: "Bindery only", filters: [{ key: "chapter", op: "is", value: "Bindery" }] },
-  { id: "large", label: "Over 10 folios", filters: [{ key: "folios", op: "gt", value: 10 }] }
+  { id: "bindery", label: "Bindery only", filters: [{ field: "chapter", operator: "is", value: "Bindery" }] },
+  { id: "large", label: "Over 10 folios", filters: [{ field: "folios", operator: "gt", value: 10 }] }
 ];
 
 export default function FiltersPage() {

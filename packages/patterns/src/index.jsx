@@ -17,7 +17,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from "react";
 import { Icon, Mark, Spinner } from "@al-rayhaanat/icons";
-import { Button, IconButton, Card, Input, Divider, Badge } from "@al-rayhaanat/ui";
+import { Button, IconButton, Card, Input, Divider, Badge, useTabIndicator } from "@al-rayhaanat/ui";
 import { Transition, FadeIn, useReducedMotion } from "@al-rayhaanat/motion";
 
 /* ── behaviour shared by every overlay ──────────────────────────────────── */
@@ -264,10 +264,11 @@ export function Tabs({ items = [], value, onChange, variant = "rule", children }
     if (e.key === fwd) set(ids[(i + 1) % ids.length]);
     if (e.key === back) set(ids[(i - 1 + ids.length) % ids.length]);
   };
+  const [list, indicator] = useTabIndicator(active, variant);
   return (
     <div style={{ display: "grid", gap: "var(--space-5)" }}>
-      <div role="tablist" onKeyDown={onKey}
-        style={{ display: "flex", flexWrap: "wrap",
+      <div role="tablist" onKeyDown={onKey} ref={list}
+        style={{ position: "relative", display: "flex", flexWrap: "wrap",
           gap: variant === "pill" ? "var(--space-2)" : "var(--space-5)",
           padding: variant === "pill" ? "var(--space-1)" : 0,
           borderRadius: variant === "pill" ? "var(--radius-full)" : 0,
@@ -275,34 +276,31 @@ export function Tabs({ items = [], value, onChange, variant = "rule", children }
           inlineSize: variant === "pill" ? "fit-content" : undefined,
           maxInlineSize: "100%",
           borderBlockEnd: variant === "pill" ? "none" : "var(--border-hairline) solid var(--border)" }}>
+        {indicator}
         {items.map(item => {
           const id = item.id ?? item, label = item.label ?? item;
           const on = id === active;
           return (
             <button key={id} role="tab" aria-selected={on} tabIndex={on ? 0 : -1} onClick={() => set(id)}
               style={variant === "pill" ? {
+                position: "relative", zIndex: 1,
                 display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
-                border: 0, cursor: "pointer", minBlockSize: 32,
+                border: 0, cursor: "pointer", minBlockSize: 32, background: "transparent",
                 paddingInline: "var(--space-4)", paddingBlock: "var(--space-2)",
                 borderRadius: "var(--radius-full)",
                 fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
                 fontWeight: on ? "var(--weight-medium)" : "var(--weight-regular)",
                 color: on ? "var(--text-on-interactive)" : "var(--text-secondary)",
-                background: on ? "var(--interactive-solid)" : "transparent",
-                boxShadow: on ? "var(--shadow-sm)" : "none",
-                transitionProperty: "background-color, color",
-                transitionDuration: "var(--duration-fast)"
+                transitionProperty: "color", transitionDuration: "var(--duration-fast)"
               } : {
+                position: "relative", zIndex: 1,
                 display: "inline-flex", alignItems: "center", gap: "var(--space-2)",
                 background: "transparent", border: 0, cursor: "pointer",
                 paddingBlock: "0 var(--space-3)", paddingInline: 0,
-                marginBlockEnd: "calc(var(--border-hairline) * -1)",
                 fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
                 fontWeight: on ? "var(--weight-medium)" : "var(--weight-regular)",
                 color: on ? "var(--interactive)" : "var(--text-secondary)",
-                borderBlockEnd: `var(--border-thick) solid ${on ? "var(--interactive-solid)" : "transparent"}`,
-                transitionProperty: "color, border-color",
-                transitionDuration: "var(--duration-fast)"
+                transitionProperty: "color", transitionDuration: "var(--duration-fast)"
               }}>
               {item.icon && <Icon name={item.icon} size={15} />}
               {label}
@@ -803,6 +801,26 @@ export function GhostMenu({
     if (onOpenChange) onOpenChange(next);
   }, [openProp, onOpenChange]);
   const wrap = useRef(null);
+  /* A panel anchored to its trigger's inline-end runs leftward, and a trigger
+     near the start of a scrolling region pushes it outside — where the region's
+     overflow clips it and it reads as "hidden behind the nav". Measure as the
+     panel attaches and anchor the other way when there is no room. Measuring in
+     an effect is too early: Transition mounts the node a tick later. */
+  const [flipped, setFlipped] = useState(false);
+  const side = flipped ? (align === "start" ? "end" : "start") : align;
+
+  const measure = useCallback(node => {
+    if (!node || !wrap.current) return;
+    const box = node.getBoundingClientRect();
+    let clip = wrap.current.parentElement;
+    while (clip && clip !== document.body && getComputedStyle(clip).overflowX === "visible") clip = clip.parentElement;
+    const bounds = clip && clip !== document.body
+      ? clip.getBoundingClientRect()
+      : { left: 0, right: window.innerWidth };
+    setFlipped(box.left < bounds.left + 1 || box.right > bounds.right - 1);
+  }, []);
+
+  useEffect(() => { if (!open) setFlipped(false); }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -823,8 +841,8 @@ export function GhostMenu({
       <GhostButton icon={icon} label={label} tone={tone} active={active} count={count}
         size={size} expanded={open} onClick={() => setOpen(!open)} />
       <Transition show={open} preset="fade-down" duration="fast">
-        <div role="menu" style={{ position: "absolute", insetBlockStart: "calc(100% + var(--space-2))",
-          [align === "start" ? "insetInlineStart" : "insetInlineEnd"]: 0, minInlineSize: width,
+        <div role="menu" ref={measure} style={{ position: "absolute", insetBlockStart: "calc(100% + var(--space-2))",
+          [side === "start" ? "insetInlineStart" : "insetInlineEnd"]: 0, minInlineSize: width,
           zIndex: "var(--z-popover)", background: "var(--surface-raised)",
           borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-lg)",
           borderWidth: "var(--border-hairline)", borderStyle: "solid", borderColor: "var(--border)",

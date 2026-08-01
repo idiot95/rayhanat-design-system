@@ -45,7 +45,7 @@ export default function Overview() {
   return (
     <Page
       title="al-Rayhaanat Design System"
-      description="Tokens, components and layout for Daeratul Aqeeq products. One install, 153 components, light and dark, Latin and Arabic."
+      description="Tokens, components and layout for Daeratul Aqeeq products. One install, 154 components, light and dark, Latin and Arabic."
       meta={<Cluster gap={2}><Badge tone="accent">v1.3.0</Badge><Badge>React 18+</Badge></Cluster>}
     >
       <Card style={{ padding: "var(--space-8)" }}>

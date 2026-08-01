@@ -4,3 +4,23 @@
    The import below uses the tokens package's PUBLIC subpath — deep paths such as
    ./dist/tokens.css are not in its exports map and bundlers refuse them. */
 @import "@al-rayhaanat/tokens/tokens.css";
+
+/* The box model the system is written against.
+
+   Components set a size and then add their own padding: a field is inlineSize
+   100% plus var(--space-4) either side, a Slide is aspect-ratio 16/9 plus 8cqw
+   of gutter. Under the browser default — content-box — the padding is added
+   OUTSIDE the declared size, so the field lands 26px past its column and the
+   slide renders at 2.26:1 instead of 16:9. Both were live bugs.
+
+   That this belongs here is visible in /ui: `Center` opts back into content-box
+   explicitly, which is only meaningful if border-box is the ambient rule.
+
+   It lives in this file rather than tokens.css because that one is generated
+   from brand.json and carries a DO NOT EDIT BY HAND banner. Anything opting out
+   does so deliberately and locally, as Center does. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

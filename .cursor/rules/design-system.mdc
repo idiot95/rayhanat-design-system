@@ -7,7 +7,7 @@ This project uses `@al-rayhaanat/system` for all UI. These rules are enforced by
 `@al-rayhaanat/config` and fail the build, not warn.
 
 - Import components from `@al-rayhaanat/system`. Check the inventory in
-  `AGENTS.md` before building anything — there are 153 exports.
+  `AGENTS.md` before building anything — there are 154 exports.
 - Never add another component or icon library. `lucide-react`, `react-icons`,
   `@heroicons/react` and `framer-motion` are `no-restricted-imports` errors.
   Icons come from `Icon` (carries RTL mirror flags), motion from `Transition` /

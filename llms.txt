@@ -1,7 +1,7 @@
 # al-Rayhaanat Design System
 
 > Tokens, components and layout for Daeratul Aqeeq products. v1.3.0, React 18+.
-> 153 components across 14 packages, one umbrella install. Light and dark,
+> 154 components across 14 packages, one umbrella install. Light and dark,
 > Latin and Arabic, LTR and RTL. Distributed as source JSX on GitHub Packages.
 
 This file is a flat index designed to be pasted into a context window whole. For
@@ -40,7 +40,7 @@ tokens      —   DTCG source and generated targets: CSS vars, TS, Tailwind pres
 config      —   ESLint, TypeScript, Prettier. The enforcement mechanism. Depends on nothing.
 icons       7   Mark, Petal, Spinner, 42 glyphs with mirror flags. Depends on tokens.
 motion      8   Transition primitives; prefers-reduced-motion handled once, here. Depends on tokens.
-ui          34  Primitives and layout. Depends on tokens, icons.
+ui          35  Primitives and layout. Depends on tokens, icons.
 prose       18  Rich text. Depends on tokens, icons, ui.
 contracts   2   Required behaviour as data, plus the minimum test suite. Depends on tokens, icons, ui.
 table       6   One headless core, many presentations. Depends on tokens, icons, ui.
@@ -62,7 +62,7 @@ has nothing to filter, shell without patterns has no focus trap.
 ui: Button IconButton Link Badge Tag Dot Avatar Skeleton Card Divider Label
 Input SearchField Textarea Select Checkbox Radio Switch Stack Cluster Grid
 Split SidebarLayout Center ScrollArea Container Spacer AspectRatio PageShell
-BlockDemo Truncate OverflowRow useBreakpoint BREAKPOINTS
+BlockDemo Truncate OverflowRow useBreakpoint BREAKPOINTS useTabIndicator
 
 prose: Prose Lede ProseHeading Callout BulletList NumberedList Steps
 DefinitionList Blockquote PullQuote CodeBlock InlineCode Kbd Highlight

@@ -60,6 +60,13 @@ export function Transition({
   const reduced = useReducedMotion();
   const [mounted, setMounted] = useState(show);
   const [visible, setVisible] = useState(false);
+  /* `will-change` is a promise to the compositor, and an expensive one to leave
+     standing: it creates a stacking context AND becomes the containing block for
+     any descendant `position: fixed`. Left on permanently it traps every popover
+     and menu inside this element's stacking context, and it makes a fixed modal
+     scrim size itself to this element rather than the viewport. So the hint is
+     held only while the transition is actually running, and dropped after. */
+  const [animating, setAnimating] = useState(false);
   const timer = useRef(null);
   const enterMs = reduced ? 0 : MS[duration] ?? MS.normal;
   const exitMs = reduced ? 0 : MS[exitDuration || duration] ?? enterMs;
@@ -76,6 +83,14 @@ export function Transition({
     return () => clearTimeout(timer.current);
   }, [show, delay, exitMs]);
 
+  useEffect(() => {
+    if (reduced) { setAnimating(false); return undefined; }
+    setAnimating(true);
+    const ms = (visible ? enterMs : exitMs) + 60;
+    const t = setTimeout(() => setAnimating(false), ms);
+    return () => clearTimeout(t);
+  }, [visible, reduced, enterMs, exitMs]);
+
   if (!mounted) return null;
   const p = PRESETS[preset] || PRESETS.fade;
   const Tag = as;
@@ -84,7 +99,7 @@ export function Transition({
       transitionProperty: "opacity, transform",
       transitionDuration: `${visible ? enterMs : exitMs}ms`,
       transitionTimingFunction: visible ? "var(--ease-emphasized)" : "var(--ease-exit)",
-      willChange: reduced ? undefined : "opacity, transform",
+      willChange: animating && !reduced ? "opacity, transform" : undefined,
       ...(reduced ? { opacity: visible ? 1 : 0 } : (visible ? p.to : p.from)),
       ...style
     }} {...rest}>{children}</Tag>

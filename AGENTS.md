@@ -13,7 +13,7 @@ The system is not a suggestion layer. Most of the rules below are enforced by
 Import components from `@al-rayhaanat/system`. Never write a raw hex colour, a
 pixel value, or a physical direction (`margin-left`, `left`, `text-align: left`)
 — use semantic CSS variables and logical properties. Never rebuild a component
-that already exists; there are 153 exports and the list is below. Theme and
+that already exists; there are 154 exports and the list is below. Theme and
 direction come from `<html data-theme dir lang>` and nothing else.
 
 ---
@@ -143,12 +143,12 @@ Enforced by `jsx-a11y` at `strict`:
 
 Everything below is a named export of `@al-rayhaanat/system`.
 
-**Layout & primitives** (`ui`, 34) — `Button` `IconButton` `Link` `Badge` `Tag`
+**Layout & primitives** (`ui`, 35) — `Button` `IconButton` `Link` `Badge` `Tag`
 `Dot` `Avatar` `Skeleton` `Card` `Divider` `Label` `Input` `SearchField`
 `Textarea` `Select` `Checkbox` `Radio` `Switch` `Stack` `Cluster` `Grid`
 `Split` `SidebarLayout` `Center` `ScrollArea` `Container` `Spacer`
 `AspectRatio` `PageShell` `BlockDemo` `Truncate` `OverflowRow` `useBreakpoint`
-`BREAKPOINTS`
+`BREAKPOINTS` `useTabIndicator`
 
 **Rich text** (`prose`, 18) — `Prose` `Lede` `ProseHeading` `Callout`
 `BulletList` `NumberedList` `Steps` `DefinitionList` `Blockquote` `PullQuote`

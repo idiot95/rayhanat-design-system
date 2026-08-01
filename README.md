@@ -5,7 +5,7 @@
 # al-Rayhaanat Design System
 
 **Tokens, components and layout for Daeratul Aqeeq products.**
-One install, 153 components, light and dark, Latin and Arabic.
+One install, 154 components, light and dark, Latin and Arabic.
 
 `v1.3.0` · React 18+ · [Token reference](packages/tokens/README.md) · [Package map](packages/README.md) · [For AI agents](AGENTS.md)
 
@@ -123,7 +123,7 @@ Install `@al-rayhaanat/system` and all of this comes from one import:
 
 | Package | Exports | What it is |
 | --- | --- | --- |
-| [`ui`](packages/ui) | 34 | Primitives and layout — `Button`, `Card`, `Input`, `Stack`, `Grid`, `Split`, `useBreakpoint` |
+| [`ui`](packages/ui) | 35 | Primitives and layout — `Button`, `Card`, `Input`, `Stack`, `Grid`, `Split`, `useBreakpoint` |
 | [`prose`](packages/prose) | 18 | Rich text — `Callout`, `Steps`, `PullQuote`, `CodeBlock`, `Footnotes`, five list markers |
 | [`patterns`](packages/patterns) | 23 | Overlays, states and the ghost toolbar controls — `Modal`, `Drawer`, `Toast`, `CommandPalette`, `GhostButton`, `ExpandingSearch` |
 | [`filters`](packages/filters) | 13 | Declared and dynamic filters with the URL as state — `FilteredTable`, `FilterBar`, `SavedViews` |

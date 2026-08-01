@@ -32,6 +32,25 @@ function useInteract(disabled, force) {
     onBlur: () => setState(s => ({ ...s, focus: false }))
   }, ref];
 }
+/**
+ * prefers-reduced-motion, read locally. /ui sits below /motion in the dependency
+ * table and must not import it, and a press that SNAPS to 97% is worse than one
+ * that never moves — so the transform is dropped entirely rather than run at the
+ * zero duration tokens.css falls back to.
+ */
+function useCalmMotion() {
+  const [calm, setCalm] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const read = () => setCalm(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+  return calm;
+}
+
 const ring = focus => focus
   ? { outline: "var(--border-focus) solid var(--focus-ring)", outlineOffset: "2px" }
   : { outline: "none" };
@@ -77,6 +96,7 @@ export function Button({
   block, type = "button", forceState, children, style, ...rest
 }) {
   const [s, handlers] = useInteract(disabled || loading, forceState);
+  const calm = useCalmMotion();
   const t = BUTTON_TONES[variant] || BUTTON_TONES.primary;
   const dim = SIZES[size] || SIZES.md;
   return (
@@ -88,8 +108,11 @@ export function Button({
         fontFamily: "var(--font-body)", fontSize: dim.font, fontWeight: "var(--weight-medium)",
         lineHeight: 1, textDecoration: "none", whiteSpace: "nowrap",
         borderRadius: "var(--radius-md)", borderWidth: "var(--border-hairline)", borderStyle: "solid",
-        transitionProperty: "background-color, border-color, color",
+        transitionProperty: "background-color, border-color, color, transform",
         transitionDuration: "var(--duration-fast)", transitionTimingFunction: "var(--ease-standard)",
+        /* The press answers back. Small enough to read as pressure rather than
+           as the button moving away from the finger. */
+        transform: !calm && s.active && !disabled && !loading ? "scale(0.97)" : undefined,
         cursor: disabled ? "not-allowed" : loading ? "progress" : "pointer",
         opacity: disabled ? 0.45 : 1,
         ...t.rest, ...(s.hover ? t.hover : null), ...(s.active ? t.active : null), ...ring(s.focus), ...style
@@ -216,7 +239,13 @@ export function Skeleton({ width = "100%", height = 14, radius = "var(--radius-s
 /** Bordered surface. `tone="raised"` adds elevation; `interactive` adds hover + focus. */
 export function Card({ tone = "default", interactive, as = "div", forceState, children, style, ...rest }) {
   const [s, handlers] = useInteract(false, forceState);
+  const calm = useCalmMotion();
   const Tag_ = as;
+  /* An interactive card lifts a little under the pointer and settles back on
+     press — the same grammar as Button, so the two read as one system. */
+  const lift = interactive && !calm
+    ? s.active ? "translateY(0)" : s.hover ? "translateY(-2px)" : undefined
+    : undefined;
   return (
     <Tag_ {...(interactive ? { ...handlers, tabIndex: 0 } : null)}
       style={{
@@ -225,8 +254,11 @@ export function Card({ tone = "default", interactive, as = "div", forceState, ch
         background: tone === "raised" ? "var(--surface-raised)" : "var(--surface)",
         borderWidth: "var(--border-hairline)", borderStyle: "solid",
         borderColor: interactive && s.hover ? "var(--border-interactive)" : "var(--border)",
-        boxShadow: tone === "raised" ? "var(--shadow-md)" : "none",
-        transitionProperty: "border-color, box-shadow", transitionDuration: "var(--duration-fast)",
+        boxShadow: interactive && s.hover ? "var(--shadow-md)"
+          : tone === "raised" ? "var(--shadow-md)" : "none",
+        transform: lift,
+        transitionProperty: "border-color, box-shadow, transform",
+        transitionDuration: "var(--duration-fast)", transitionTimingFunction: "var(--ease-standard)",
         cursor: interactive ? "pointer" : undefined, ...ring(s.focus), ...style
       }} {...rest}>{children}</Tag_>
   );
@@ -235,10 +267,19 @@ export function Card({ tone = "default", interactive, as = "div", forceState, ch
 /** A hairline. `label` puts a centred caption in the rule; `mark` puts the motif in it. */
 export function Divider({ label, mark, style }) {
   const line = { flex: 1, blockSize: 1, background: "var(--border)" };
-  if (!label && !mark) return <hr style={{ border: 0, ...line, marginBlock: "var(--space-6)", ...style }} />;
+  /* Two things this used to get wrong inside a grid, which is where most of the
+     system puts it. `flex: 1` does nothing to a grid item, and an <hr> carries a
+     UA `margin-inline: auto` — so the rule shrank to nothing and vanished. And a
+     baked-in marginBlock stacks on top of the parent's `gap`, which is what made
+     an opened filter panel look padded out. Spacing belongs to the parent: every
+     container in this system is gap-driven. */
+  if (!label && !mark) {
+    return <hr style={{ border: 0, blockSize: 1, inlineSize: "100%",
+      background: "var(--border)", margin: 0, ...style }} />;
+  }
   return (
     <div role="separator" style={{ display: "flex", alignItems: "center", gap: "var(--space-4)",
-      marginBlock: "var(--space-6)", ...style }}>
+      inlineSize: "100%", ...style }}>
       <span style={line} />
       {mark ? <Mark size={16} /> : (
         <span style={{ fontSize: "var(--text-2xs)", letterSpacing: "var(--tracking-kicker)",
@@ -252,6 +293,11 @@ export function Divider({ label, mark, style }) {
 /* ══ form primitives ═══════════════════════════════════════════════════════ */
 
 const FIELD_BASE = {
+  /* Every field sets inlineSize 100% and then adds its own padding and border.
+     Under the browser default content-box that lands 26px past the column and
+     the field spills over its neighbour. Declared here as well as in the
+     stylesheet, so a product consuming /ui without tokens.css still fits. */
+  boxSizing: "border-box",
   inlineSize: "100%", fontFamily: "var(--font-body)", fontSize: "var(--text-sm)",
   color: "var(--text-primary)", background: "var(--surface)",
   borderRadius: "var(--radius-md)", borderWidth: "var(--border-hairline)", borderStyle: "solid",
@@ -633,4 +679,60 @@ export function OverflowRow({ keep = 2, menu, children, style }) {
       ))}
     </div>
   );
+}
+/**
+ * The sliding tab indicator, shared by /patterns' Tabs and /filters' ScopeTabs.
+ *
+ * Painting the active state as a border or background on the button itself means
+ * it can only ever cut — there is nothing to move. One element positioned over
+ * the list can travel, so the eye follows the selection instead of re-finding it.
+ *
+ * Returns `[ref, node]`: put the ref on the tablist (give it `position:relative`)
+ * and render the node as its first child. Duration comes from `--duration-normal`,
+ * which tokens.css zeroes under `prefers-reduced-motion` — so the indicator
+ * arrives instantly there without this hook knowing anything about it.
+ */
+export function useTabIndicator(activeKey, variant = "rule") {
+  const ref = useRef(null);
+  const [box, setBox] = useState(null);
+
+  useEffect(() => {
+    const list = ref.current;
+    if (!list) return undefined;
+    const measure = () => {
+      const el = list.querySelector('[aria-selected="true"]');
+      if (!el) return setBox(null);
+      const lb = list.getBoundingClientRect(), b = el.getBoundingClientRect();
+      /* Measure the distance along the INLINE axis, not from the left edge, so
+         the same number carries over to RTL. */
+      const rtl = getComputedStyle(list).direction === "rtl";
+      setBox({
+        start: rtl ? lb.right - b.right : b.left - lb.left,
+        top: b.top - lb.top, w: b.width, h: b.height, rtl
+      });
+    };
+    measure();
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    if (ro) ro.observe(list);
+    return () => { if (ro) ro.disconnect(); };
+  }, [activeKey, variant]);
+
+  if (!box) return [ref, null];
+  const shared = {
+    position: "absolute", insetInlineStart: 0, inlineSize: box.w,
+    transform: `translateX(${box.rtl ? -box.start : box.start}px)`,
+    transitionProperty: "transform, inline-size",
+    transitionDuration: "var(--duration-normal)",
+    transitionTimingFunction: "var(--ease-emphasized)",
+    pointerEvents: "none"
+  };
+  const node = (
+    <span aria-hidden="true" style={variant === "pill"
+      ? { ...shared, insetBlockStart: box.top, blockSize: box.h,
+          borderRadius: "var(--radius-full)", background: "var(--interactive-solid)",
+          boxShadow: "var(--shadow-sm)" }
+      : { ...shared, insetBlockEnd: 0, blockSize: "var(--border-thick)",
+          background: "var(--interactive-solid)" }} />
+  );
+  return [ref, node];
 }
