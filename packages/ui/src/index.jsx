@@ -12,7 +12,7 @@
  *   · touch targets: size="lg" is 44px, the floor for mobile
  */
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Mark, Icon, Spinner } from "@al-rayhaanat/icons";
 
 /* ── interaction state, shared by every control ─────────────────────────── */

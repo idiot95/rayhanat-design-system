@@ -321,6 +321,11 @@ export function SideNav({ groups = [], current, collapsed, onToggleCollapsed, fo
               const row = (
                 <a key={item.label} href={item.href || "#"} aria-current={on ? "page" : undefined}
                   onClick={onNavigate ? () => onNavigate(item) : undefined}
+                  /* Collapsed, the label is not rendered and the icon is
+                     aria-hidden — without these the link has no accessible name
+                     at all, and no tooltip. */
+                  aria-label={collapsed ? item.label : undefined}
+                  title={collapsed ? item.label : undefined}
                   style={{ display: "flex", alignItems: "center",
                     gap: collapsed ? 0 : "var(--space-3)",
                     justifyContent: collapsed ? "center" : undefined,

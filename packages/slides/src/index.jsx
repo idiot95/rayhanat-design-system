@@ -31,6 +31,10 @@ export function Slide({ tone = "paper", pad = "8cqw", align = "center", lang, di
   const arabic = dir === "rtl" || lang === "ar";
   return (
     <section lang={lang} dir={dir} style={{
+      /* border-box, or `aspect-ratio` resolves against the CONTENT box and the
+         16:9 promise is broken by `pad` — a cover slide renders near 2.26:1, and
+         the on-screen deck stops matching what buildDeck() exports. */
+      boxSizing: "border-box",
       aspectRatio: "16 / 9", containerType: "size", position: "relative", overflow: "hidden",
       display: "grid", alignContent: align, paddingInline: pad,
       background: ink ? INK : "var(--canvas)",

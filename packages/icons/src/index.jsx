@@ -71,9 +71,13 @@ export function Mark({ size = 24, tone = "brand", shape, color = "var(--interact
 
 /** One petal — bullet, marker, sort caret, ornament. */
 export function Petal({ size = 16, rotate = 0, opacity = 1, style }) {
+  /* `size` may be a number OR any CSS length — /slides sizes its petals in `cqw`
+     so they scale with the deck. Multiplying a string gives NaN, which React
+     drops, leaving the petal to fall back on its intrinsic ratio. */
+  const width = typeof size === "number" ? size * 0.52 : `calc(${size} * 0.52)`;
   return (
     <svg viewBox="826 238 348 672" aria-hidden="true"
-      style={{ width: size * 0.52, height: size, display: "block", transform: `rotate(${rotate}deg)`, opacity, ...style }}>
+      style={{ width, height: size, display: "block", transform: `rotate(${rotate}deg)`, opacity, ...style }}>
       <path d={PETAL} fill="currentColor" />
     </svg>
   );
