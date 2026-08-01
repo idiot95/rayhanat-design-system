@@ -9,6 +9,7 @@ build/
 *.tsbuildinfo
 .next/
 .vercel/
+out/
 
 # ...but the design system's generated artifacts are COMMITTED on purpose, so
 # consumers need no build step (see packages/tokens/README.md). Without these

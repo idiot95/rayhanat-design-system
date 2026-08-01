@@ -9,5 +9,13 @@
  * so the docs site consumes the packages the same way a product does.
  */
 export default {
-  transpilePackages: ["@al-rayhaanat/system"]
+  transpilePackages: ["@al-rayhaanat/system"],
+
+  /**
+   * Every route here is prerendered — there is no server component doing work at
+   * request time, no route handler, no middleware. Exporting to plain HTML makes
+   * that explicit, and makes the site deployable from any static host with no
+   * Next.js runtime and no platform-specific project settings.
+   */
+  output: "export"
 };

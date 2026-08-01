@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm --filter @al-rayhaanat/docs build",
+  "outputDirectory": "apps/docs/out",
+  "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false
+}

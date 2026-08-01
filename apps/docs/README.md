@@ -7,12 +7,14 @@ package, plus foundations and the contracts.
 pnpm dev      # from the repository root
 ```
 
-Deploying: set the Vercel project's **Root Directory** to `apps/docs`, which
-installs from the workspace root so `packages/*` resolve. `vercel.json` here
-declares the framework — Vercel only runs framework detection at import time, so
-a project first imported at the repository root stays on the `Other` preset and
-builds this app as a static site. See the root README for the two failure modes,
-both of which report a successful build.
+`next.config.mjs` sets `output: "export"`. Every route here is prerendered —
+no route handlers, no middleware, nothing doing work at request time — so
+`pnpm build` emits plain HTML into `out/` and the site needs no Next.js runtime
+to host. Deployment is configured by the repository-root
+[`vercel.json`](../../vercel.json); no Vercel project settings are involved.
+
+Keep it that way. Adding a route handler, middleware, a server action or a
+dynamic segment will break the export, and the build will tell you so.
 
 ## Why it consumes the packages the hard way
 

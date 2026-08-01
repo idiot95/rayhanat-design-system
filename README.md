@@ -230,25 +230,33 @@ element and nothing else. Watch the whole site follow.
 
 ### Deploying it
 
-This is a monorepo, and the deployable app is not at the repository root — so
-the one setting that matters is **Root Directory**:
+The site is a **static export**: every route is prerendered, so `pnpm build`
+emits plain HTML into `apps/docs/out` and there is no Next.js runtime to host.
+[`vercel.json`](vercel.json) points Vercel at that directory.
 
-> Vercel → Project → Settings → Build & Deployment → **Root Directory** →
-> `apps/docs`
+Import the repository and deploy. **No project settings need changing** — not
+the Root Directory, not the framework preset. Everything is in the file, so it
+cannot drift and it cannot be half-applied.
 
-With that set, Vercel installs from the workspace root so `packages/*` resolve,
-and builds the app in place. [`apps/docs/vercel.json`](apps/docs/vercel.json)
-declares the framework, because Vercel only runs framework **detection** when a
-project is first imported — changing the Root Directory afterwards does not
-re-run it, so a project imported at the repository root stays on the `Other`
-preset forever. Committing it means the setting cannot drift.
+The build consumes the packages through `workspace:*`, so **no registry token is
+required** — it reads the source next door rather than installing from GitHub
+Packages.
 
-Two failure modes, both of which report a *successful* build:
+```bash
+pnpm build               # → apps/docs/out
+```
 
-| Symptom | Cause |
-| --- | --- |
-| `404: NOT_FOUND` on every URL | Project root is the repository root. The root has no `next` dependency, so Vercel's Next.js builder finds no app and emits nothing routable. `outputDirectory` cannot compensate. |
-| `No Output Directory named "public" found` | Framework preset is `Other`, so Vercel built the app but then looked for a static site. Fix the preset, or let the committed `vercel.json` declare it. |
+Because the output is ordinary static files, the same build deploys to GitHub
+Pages, S3, Netlify or any file host. Nothing about it is Vercel-specific.
+
+> [!NOTE]
+> Deploying it as a **Next.js** project instead needs the Root Directory set to
+> `apps/docs`, because the repository root has no `next` dependency for Vercel's
+> builder to find. Both failure modes report a *successful* build and neither
+> error names its real cause: pointing a root-level project at `apps/docs/.next`
+> serves `404: NOT_FOUND` on every URL, and leaving the framework preset on
+> `Other` fails with `No Output Directory named "public" found`. The static
+> export sidesteps both.
 
 The build consumes the packages through `workspace:*`, so **no registry token is
 required** — it reads the source next door rather than installing from GitHub
