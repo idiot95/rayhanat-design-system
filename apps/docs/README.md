@@ -7,6 +7,11 @@ package, plus foundations and the contracts.
 pnpm dev      # from the repository root
 ```
 
+Deploying: set the Vercel project's **Root Directory** to `apps/docs`. Vercel
+detects Next.js from there and installs from the workspace root, so
+`packages/*` resolve. Pointing a repository-root project at `apps/docs/.next`
+does not work — see the README's deploy section for why.
+
 ## Why it consumes the packages the hard way
 
 The site imports `@al-rayhaanat/system` through `workspace:*` and transpiles it

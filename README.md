@@ -230,13 +230,27 @@ element and nothing else. Watch the whole site follow.
 
 ### Deploying it
 
-The repository is deploy-ready: [`vercel.json`](vercel.json) sets the build
-command, output directory and framework, so importing the repo needs no
-dashboard configuration. The build consumes the packages through `workspace:*`,
-which means **no registry token is required** — it reads the source next door.
+This is a monorepo, and the deployable app is not at the repository root — so
+the one setting that matters is **Root Directory**:
+
+> Vercel → Project → Settings → Build & Deployment → **Root Directory** →
+> `apps/docs`
+
+With that set, Vercel detects Next.js on its own, installs from the workspace
+root so `packages/*` resolve, and builds the app in place. No `vercel.json` is
+needed, and none is committed.
+
+Do **not** point a repository-root project at `apps/docs/.next` with
+`outputDirectory` instead. The root has no `next` dependency, so Vercel's
+Next.js builder finds no app there, emits nothing routable, and every URL
+returns `404: NOT_FOUND` from the edge — with a build that reports success.
+
+The build consumes the packages through `workspace:*`, so **no registry token is
+required** — it reads the source next door rather than installing from GitHub
+Packages.
 
 ```bash
-pnpm build               # what Vercel runs — builds apps/docs
+pnpm build               # the same build, locally
 ```
 
 ---
