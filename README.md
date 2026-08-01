@@ -210,6 +210,37 @@ every token, designed to be pasted into a context window whole.
 
 ---
 
+## The documentation site
+
+[`apps/docs`](apps/docs) is a Next.js App Router project: fourteen pages, one
+per package plus foundations and the contracts. Every specimen on it is rendered
+by the packages in this repository, imported exactly the way a product imports
+them.
+
+That is the point of it. The site's own chrome is `AppShell`, `SideNav` and
+`TopBar`, and its `next.config.mjs` carries the `transpilePackages` line
+documented above — so the site **demonstrates** those instructions rather than
+asserting them. If the shell breaks, the documentation stops rendering instead
+of quietly describing something that no longer works. The foundations page
+generates every swatch, scale and ramp from the token data at runtime, so a
+renamed or removed token shows up there on the next build.
+
+The three toggles in the top bar set `data-theme`, `dir` and `lang` on the root
+element and nothing else. Watch the whole site follow.
+
+### Deploying it
+
+The repository is deploy-ready: [`vercel.json`](vercel.json) sets the build
+command, output directory and framework, so importing the repo needs no
+dashboard configuration. The build consumes the packages through `workspace:*`,
+which means **no registry token is required** — it reads the source next door.
+
+```bash
+pnpm build               # what Vercel runs — builds apps/docs
+```
+
+---
+
 ## Local development
 
 ```bash
@@ -223,10 +254,17 @@ pnpm dev                 # documentation site with every component, live
 | Command | What it does |
 | --- | --- |
 | `pnpm dev` | Documentation site — every component, both themes, both directions |
+| `pnpm build` | Production build of the documentation site |
 | `pnpm lint` | The rules that fail the build |
 | `pnpm typecheck` | `tsc --noEmit`, strict |
 | `pnpm test` | The contracts' minimum suite |
 | `pnpm build:bundle` | Regenerates `arh.global.jsx` for bundler-less surfaces |
+
+> [!NOTE]
+> `AppShell` wraps its main content in `FadeIn`, which renders `null` on the
+> server. A green `next build` therefore does **not** prove a page renders — the
+> prerender never executes it. Verify pages in a browser, or with the chrome
+> bypassed.
 
 > [!WARNING]
 > **Do not run `pnpm build:tokens`.** It is currently destructive — it deletes
