@@ -236,14 +236,19 @@ the one setting that matters is **Root Directory**:
 > Vercel → Project → Settings → Build & Deployment → **Root Directory** →
 > `apps/docs`
 
-With that set, Vercel detects Next.js on its own, installs from the workspace
-root so `packages/*` resolve, and builds the app in place. No `vercel.json` is
-needed, and none is committed.
+With that set, Vercel installs from the workspace root so `packages/*` resolve,
+and builds the app in place. [`apps/docs/vercel.json`](apps/docs/vercel.json)
+declares the framework, because Vercel only runs framework **detection** when a
+project is first imported — changing the Root Directory afterwards does not
+re-run it, so a project imported at the repository root stays on the `Other`
+preset forever. Committing it means the setting cannot drift.
 
-Do **not** point a repository-root project at `apps/docs/.next` with
-`outputDirectory` instead. The root has no `next` dependency, so Vercel's
-Next.js builder finds no app there, emits nothing routable, and every URL
-returns `404: NOT_FOUND` from the edge — with a build that reports success.
+Two failure modes, both of which report a *successful* build:
+
+| Symptom | Cause |
+| --- | --- |
+| `404: NOT_FOUND` on every URL | Project root is the repository root. The root has no `next` dependency, so Vercel's Next.js builder finds no app and emits nothing routable. `outputDirectory` cannot compensate. |
+| `No Output Directory named "public" found` | Framework preset is `Other`, so Vercel built the app but then looked for a static site. Fix the preset, or let the committed `vercel.json` declare it. |
 
 The build consumes the packages through `workspace:*`, so **no registry token is
 required** — it reads the source next door rather than installing from GitHub
