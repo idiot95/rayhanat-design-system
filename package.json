@@ -12,6 +12,7 @@
     "dev": "pnpm --filter @al-rayhaanat/docs dev",
     "build:tokens": "style-dictionary build --config tokens/style-dictionary.config.mjs",
     "build:bundle": "node scripts/bundle-global.mjs",
+    "build": "pnpm --filter @al-rayhaanat/docs build",
     "build:docs": "pnpm --filter @al-rayhaanat/docs build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

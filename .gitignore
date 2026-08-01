@@ -7,6 +7,8 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+.next/
+.vercel/
 
 # ...but the design system's generated artifacts are COMMITTED on purpose, so
 # consumers need no build step (see packages/tokens/README.md). Without these
