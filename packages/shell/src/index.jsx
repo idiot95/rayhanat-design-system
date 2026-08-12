@@ -398,13 +398,29 @@ export function Toolbar({ children, style }) {
   );
 }
 
-/** The admin frame: sidebar + top bar + scrolling main. */
+/**
+ * The admin frame: sidebar + top bar + scrolling main.
+ *
+ * The root is exactly one viewport tall, because everything under it depends on
+ * that: `main` can only scroll against a bounded parent, a sticky TopBar can
+ * only stick inside one, and SideNav takes its height from the flex row rather
+ * than from its own content. Left unbounded the shell shrink-wraps to whatever
+ * it contains — the rail then stops mid-page with bare ground beneath it, and a
+ * long page scrolls the document and `main` at the same time.
+ *
+ * `dvh` rather than `vh` so mobile browser chrome does not clip the last rows.
+ * `style` still spreads last, so a host that genuinely wants a different height
+ * can say so.
+ */
 export function AppShell({ sideNav, topBar, header, children, style }) {
   return (
-    <div style={{ display: "flex", minBlockSize: 0, background: "var(--canvas)",
+    <div style={{ display: "flex", blockSize: "100dvh", background: "var(--canvas)",
       color: "var(--text-primary)", fontFamily: "var(--font-body)", ...style }}>
       {sideNav}
-      <div style={{ flex: 1, minInlineSize: 0, display: "grid",
+      {/* minBlockSize: 0 belongs here, on the flex item: it is what lets the grid
+          row shrink below its content so `main` can scroll. On the root it did
+          nothing except stop the shell filling the viewport. */}
+      <div style={{ flex: 1, minInlineSize: 0, minBlockSize: 0, display: "grid",
         gridTemplateRows: `${topBar ? "auto " : ""}minmax(0,1fr)` }}>
         {topBar}
         <main style={{ overflow: "auto", padding: "var(--space-6)" }}>
@@ -418,12 +434,19 @@ export function AppShell({ sideNav, topBar, header, children, style }) {
   );
 }
 
-/** Public site and sign-in pages: top bar, centred measure, no chrome. */
+/**
+ * Public site and sign-in pages: top bar, centred measure, no chrome.
+ *
+ * A *minimum* of one viewport, not a fixed one: this shell has no internal
+ * scroll region, so a long page is meant to scroll the document. The minimum
+ * only stops a short page — a sign-in form, a 404 — from leaving bare ground
+ * below the footer.
+ */
 export function MarketingShell({ topBar, children, footer, style }) {
   return (
     <div style={{ background: "var(--canvas)", color: "var(--text-primary)",
       fontFamily: "var(--font-body)", display: "grid",
-      gridTemplateRows: "auto minmax(0,1fr) auto", minBlockSize: 0, ...style }}>
+      gridTemplateRows: "auto minmax(0,1fr) auto", minBlockSize: "100dvh", ...style }}>
       {topBar}
       <main style={{ inlineSize: "100%", maxInlineSize: 1080, marginInline: "auto",
         paddingInline: "var(--space-6)", paddingBlock: "var(--space-9)" }}>{children}</main>
@@ -433,12 +456,18 @@ export function MarketingShell({ topBar, children, footer, style }) {
   );
 }
 
-/** One task, one way out. No navigation to wander into. */
+/**
+ * One task, one way out. No navigation to wander into.
+ *
+ * A minimum rather than a fixed height, for the same reason as MarketingShell:
+ * the single centred panel usually falls well short of the viewport, and the
+ * task is allowed to be taller than one screen.
+ */
 export function FocusShell({ title, description, exitLabel = "Back", onExit, children, style }) {
   return (
     <div style={{ background: "var(--canvas)", color: "var(--text-primary)",
       fontFamily: "var(--font-body)", display: "grid", gridTemplateRows: "auto minmax(0,1fr)",
-      minBlockSize: 0, ...style }}>
+      minBlockSize: "100dvh", ...style }}>
       <header style={{ display: "flex", alignItems: "center", gap: "var(--space-4)",
         padding: "var(--space-4) var(--space-6)",
         borderBlockEnd: "var(--border-hairline) solid var(--border)" }}>
@@ -474,9 +503,11 @@ export function MobileShell({ brand = "Bindery", groups = [], tabs = [], current
          stays inside the phone frame instead of covering the document */
       position: contained ? "relative" : undefined,
       overflow: contained ? "hidden" : undefined,
-      /* fill the box the frame gave us — without this the shell shrink-wraps to
-         its content and the absolute drawer is measured against that, not the frame */
-      blockSize: contained ? "100%" : undefined, ...style }}>
+      /* Fill whatever box we are in: the frame when contained, the viewport
+         otherwise. Either way it must be bounded — `main` scrolls internally and
+         the tab bar is pinned to the last grid row, and neither works against a
+         shell that shrink-wraps to its content. */
+      blockSize: contained ? "100%" : "100dvh", ...style }}>
       <header style={{ display: "flex", alignItems: "center", gap: "var(--space-3)",
         padding: "var(--space-3) var(--space-4)", background: "var(--surface)",
         borderBlockEnd: "var(--border-hairline) solid var(--border)" }}>
