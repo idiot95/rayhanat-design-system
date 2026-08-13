@@ -20,6 +20,7 @@ in this table, and every one of them is real React except `tokens` and `config`.
 | `@al-rayhaanat/charts` | tokens, icons, ui | Line, area, bar, donut, sparkline, KPI stat. |
 | `@al-rayhaanat/slides` | tokens, icons, ui, charts | Deck layouts, `buildDeck()` for pptxgenjs, the `.potx` spec. |
 | **`@al-rayhaanat/system`** | **all of the above** | The whole thing in one dependency. |
+| `@al-rayhaanat/access` | jose, next | **Not in `system`, and not UI.** The module side of User Access: verify the signed envelope, gate the route with `accessProxy`, check every write with `requireAccess`. Add it only to a module the access console governs. |
 
 ## Install this
 
