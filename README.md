@@ -138,6 +138,12 @@ Install `@al-rayhaanat/system` and all of this comes from one import:
 | [`tokens`](packages/tokens) | — | The token layer: CSS vars, TS, Tailwind preset, Figma variables, the Arabic face |
 | [`config`](packages/config) | — | ESLint, TypeScript and Prettier config — the enforcement mechanism |
 
+One package sits outside that list and is **not** part of `system`:
+
+| Package | | |
+| --- | --- | --- |
+| [`access`](packages/access) | — | No React, no tokens. The module side of [User Access](packages/access/README.md): verify the signed envelope, gate the route, check the write. Install it only in a module that is governed by the access console. |
+
 ### Why one package and not fourteen
 
 You *can* install the individual packages, but **the default is `system` and you
