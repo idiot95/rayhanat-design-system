@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite --config apps/showcase/vite.config.ts",
     "build": "vite build --config apps/showcase/vite.config.ts",
-    "preview": "vite preview --config apps/showcase/vite.config.ts --port 4173 --strictPort",
+    "preview": "vite preview --config apps/showcase/vite.config.ts --host 127.0.0.1 --port 4173 --strictPort",
     "registry:build": "shadcn build registry.json --output public/r",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
