@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-header",
+  "description": "Page titles in Cormorant: the only use of the display face.",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/page-header.tsx",
+      "content": "import type * as React from \"react\";\nimport { cn } from \"@/lib/utils\";\n\n/*\n * The page title. The only component (with Wordmark) allowed to use the\n * display face, so Cormorant stays on titles and nowhere else.\n */\nexport function PageHeader({\n  title,\n  eyebrow,\n  description,\n  lead,\n  actions,\n  size = \"md\",\n  as: Tag = \"h1\",\n}: {\n  title: React.ReactNode;\n  eyebrow?: React.ReactNode;\n  description?: React.ReactNode;\n  /** A ModuleBadge, inside a module. */\n  lead?: React.ReactNode;\n  actions?: React.ReactNode;\n  size?: \"md\" | \"lg\";\n  as?: \"h1\" | \"h2\" | \"h3\" | \"h4\";\n}) {\n  return (\n    <div className=\"flex flex-wrap items-end justify-between gap-3\">\n      <div className=\"flex items-center gap-3\">\n        {lead}\n        <div>\n          {eyebrow && <p className=\"text-sm text-muted-foreground\">{eyebrow}</p>}\n          <Tag className={cn(\"font-display leading-tight font-semibold\", size === \"lg\" ? \"text-4xl\" : \"text-3xl\")}>{title}</Tag>\n          {description && <p className=\"text-sm text-muted-foreground\">{description}</p>}\n        </div>\n      </div>\n      {actions && <div className=\"flex flex-wrap gap-2\">{actions}</div>}\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/page-header.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mobile-nav",
+  "description": "MobileBar and BottomNav.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/mobile-nav.tsx",
+      "content": "import type * as React from \"react\";\nimport type { LucideIcon } from \"lucide-react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@/lib/utils\";\n\n/** Mobile top bar: menu, where you are, who you are. */\nexport function MobileBar({ title, lead, open, initials }: { title: string; lead?: React.ReactNode; open?: boolean; initials: string }) {\n  return (\n    <div className=\"flex items-center gap-2 border-b bg-background px-3 py-2\">\n      <button type=\"button\" aria-label={open ? \"Close menu\" : \"Open menu\"} aria-expanded={open ?? false}\n        className=\"grid size-9 place-items-center rounded-md outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50\">\n        {open ? <X aria-hidden=\"true\" className=\"size-5\" /> : <Menu aria-hidden=\"true\" className=\"size-5\" />}\n      </button>\n      {lead}\n      <span className=\"min-w-0 flex-1 truncate text-sm font-semibold\">{title}</span>\n      <span aria-hidden=\"true\" className=\"grid size-8 place-items-center rounded-full bg-secondary text-[11px] font-medium text-secondary-foreground\">{initials}</span>\n    </div>\n  );\n}\n\nexport type Tab = { key: string; icon: LucideIcon; label: string; href?: string };\n\n/** Bottom tabs for the gateway and member apps. Active is the primary colour: no petal. */\nexport function BottomNav({ tabs, active }: { tabs: Tab[]; active: string }) {\n  return (\n    <nav aria-label=\"Tabs\" className=\"mt-auto grid border-t bg-card px-2 pt-1.5 pb-4\" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>\n      {tabs.map(({ key, icon: Icon, label, href = \"#\" }) => (\n        <a key={key} href={href} aria-current={active === key ? \"page\" : undefined}\n          className={cn(\"flex flex-col items-center gap-0.5 rounded-md py-1 text-[11px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50\",\n            active === key ? \"font-medium text-primary\" : \"text-muted-foreground\")}>\n          <Icon aria-hidden=\"true\" className=\"size-5\" />{label}\n        </a>\n      ))}\n    </nav>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/mobile-nav.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

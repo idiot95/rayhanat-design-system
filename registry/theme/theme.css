@@ -1,0 +1,178 @@
+/*
+ * al-Rayhaanat theme — the only brand file an app imports.
+ *
+ *   @import "tailwindcss";
+ *   @import "./rayhanat.css";      ← this file, installed by `shadcn add`
+ *
+ * Radii, spacing, type scale and icons are shadcn/lucide defaults. What is brand:
+ * the colours below, Cormorant Garamond for page titles, Kanz al-Lulu for Arabic
+ * script, and the flower, which lives in <Mark /> and nowhere else.
+ */
+
+/* Tailwind's default palette is removed. `bg-red-500` does not exist; only the
+   tokens mapped further down do. This is the colour cap, enforced by the build. */
+@theme {
+  --color-*: initial;
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #fffdfa;
+  --foreground: #1e1a15;
+  --card: #ffffff;
+  --card-foreground: #1e1a15;
+  --popover: #ffffff;
+  --popover-foreground: #1e1a15;
+  --primary: #7c0b29;                 /* deep crimson: 10:1 with white */
+  --primary-foreground: #ffffff;
+  --secondary: #f6f0e7;
+  --secondary-foreground: #33291f;
+  --muted: #f6f0e7;
+  --muted-foreground: #6f6047;
+  --accent: #f8eef0;
+  --accent-foreground: #7c0b29;
+  --destructive: #b53318;             /* clay: errors never look like the brand */
+  --destructive-foreground: #ffffff;
+  --success: #16694e;
+  --warning: #8a5a00;
+  --border: #ece3d6;
+  --input: #9c8a6d;                   /* 3:1 against the background (WCAG 1.4.11) */
+  --ring: #c81643;
+  --page: #faf6ef;
+
+  /* Module hues. A module takes one slot; there are eight and no others. */
+  --hue-1: oklch(0.5 0.11 262);
+  --hue-2: oklch(0.5 0.085 175);
+  --hue-3: oklch(0.52 0.11 68);
+  --hue-4: oklch(0.5 0.11 305);
+  --hue-5: oklch(0.5 0.1 140);
+  --hue-6: oklch(0.5 0.1 220);
+  --hue-7: oklch(0.52 0.1 100);
+  --hue-8: oklch(0.5 0.08 30);
+  --module: var(--primary);
+
+  --display: "Kanz al-Lulu", "Cormorant Garamond", Georgia, serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --background: #17130f;
+    --foreground: #f7f2e9;
+    --card: #201b16;
+    --card-foreground: #f7f2e9;
+    --popover: #2b251f;
+    --popover-foreground: #f7f2e9;
+    --primary: #f79baf;
+    --primary-foreground: #38060f;
+    --secondary: #2b251f;
+    --secondary-foreground: #f7f2e9;
+    --muted: #2b251f;
+    --muted-foreground: #b3a793;
+    --accent: #2a1017;
+    --accent-foreground: #fcc3d0;
+    --destructive: #efa894;
+    --destructive-foreground: #2a120c;
+    --success: #8fccb0;
+    --warning: #e9c266;
+    --border: #3b332b;
+    --input: #7a6b53;
+    --ring: #f06a88;
+    --page: #100d0a;
+    --hue-1: oklch(0.74 0.1 262);
+    --hue-2: oklch(0.74 0.08 175);
+    --hue-3: oklch(0.78 0.1 68);
+    --hue-4: oklch(0.74 0.1 305);
+    --hue-5: oklch(0.76 0.1 140);
+    --hue-6: oklch(0.74 0.09 220);
+    --hue-7: oklch(0.8 0.1 100);
+    --hue-8: oklch(0.76 0.08 30);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #17130f;
+  --foreground: #f7f2e9;
+  --card: #201b16;
+  --card-foreground: #f7f2e9;
+  --popover: #2b251f;
+  --popover-foreground: #f7f2e9;
+  --primary: #f79baf;
+  --primary-foreground: #38060f;
+  --secondary: #2b251f;
+  --secondary-foreground: #f7f2e9;
+  --muted: #2b251f;
+  --muted-foreground: #b3a793;
+  --accent: #2a1017;
+  --accent-foreground: #fcc3d0;
+  --destructive: #efa894;
+  --destructive-foreground: #2a120c;
+  --success: #8fccb0;
+  --warning: #e9c266;
+  --border: #3b332b;
+  --input: #7a6b53;
+  --ring: #f06a88;
+  --page: #100d0a;
+  --hue-1: oklch(0.74 0.1 262);
+  --hue-2: oklch(0.74 0.08 175);
+  --hue-3: oklch(0.78 0.1 68);
+  --hue-4: oklch(0.74 0.1 305);
+  --hue-5: oklch(0.76 0.1 140);
+  --hue-6: oklch(0.74 0.09 220);
+  --hue-7: oklch(0.8 0.1 100);
+  --hue-8: oklch(0.76 0.08 30);
+}
+
+/* Module → hue slot. Add a line here when a module joins; see AGENTS.md. */
+[data-module="access"] { --module: var(--hue-1); }
+[data-module="hoto"] { --module: var(--hue-2); }
+[data-module="registration"] { --module: var(--hue-3); }
+
+/* Arabic script only (Arabic and Lisan ud-Dawat). Latin keeps the system font.
+   Copy brand/fonts/KanzalLulu-Regular.ttf to the app's public/fonts/. */
+@font-face {
+  font-family: "Kanz al-Lulu";
+  src: url("/fonts/KanzalLulu-Regular.ttf") format("truetype");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+200F, U+061F, U+060C, U+061B;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-page: var(--page);
+  --color-module: var(--module);
+  --font-display: var(--display);
+  --font-sans: "Kanz al-Lulu", ui-sans-serif, system-ui, sans-serif, "Noto Naskh Arabic", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-page text-foreground font-sans antialiased; }
+  :lang(ar), [dir="rtl"] { line-height: 1.8; }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "module-badge",
+  "description": "ModuleBadge and TodayDot: the only places a module hue appears.",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme",
+    "@rayhanat/modules"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/module-badge.tsx",
+      "content": "import { cn } from \"@/lib/utils\";\nimport { moduleByKey, type ModuleKey } from \"@/components/brand/modules\";\n\n/** A module's icon on a square tinted with its hue. One of the three places a module hue may appear. */\nexport function ModuleBadge({ module, size = \"md\" }: { module: ModuleKey; size?: \"sm\" | \"md\" | \"lg\" }) {\n  const { icon: Icon } = moduleByKey(module);\n  return (\n    <span\n      data-module={module}\n      className={cn(\n        \"grid shrink-0 place-items-center rounded-md bg-module/15 text-module\",\n        size === \"sm\" && \"size-6 [&>svg]:size-3.5\",\n        size === \"md\" && \"size-7 [&>svg]:size-4\",\n        size === \"lg\" && \"size-10 [&>svg]:size-5\"\n      )}\n    >\n      <Icon aria-hidden=\"true\" />\n    </span>\n  );\n}\n\n/** The dot that marks today in a module's lists. The second place a module hue may appear. */\nexport function TodayDot({ on = true }: { on?: boolean }) {\n  return <span aria-hidden=\"true\" className={cn(\"inline-block size-1.5 shrink-0 rounded-full\", on ? \"bg-module\" : \"bg-transparent\")} />;\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/module-badge.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

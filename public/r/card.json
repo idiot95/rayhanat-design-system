@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/ui/card.tsx",
+      "content": "import * as React from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nfunction Card({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card\" className={cn(\"bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm\", className)} {...props} />;\n}\nfunction CardHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-header\" className={cn(\"grid auto-rows-min items-start gap-1.5 px-6\", className)} {...props} />;\n}\nfunction CardTitle({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-title\" className={cn(\"leading-none font-semibold\", className)} {...props} />;\n}\nfunction CardDescription({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-description\" className={cn(\"text-muted-foreground text-sm\", className)} {...props} />;\n}\nfunction CardContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-content\" className={cn(\"px-6\", className)} {...props} />;\n}\nfunction CardFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-footer\" className={cn(\"flex items-center px-6\", className)} {...props} />;\n}\n\nexport { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

@@ -1,0 +1,368 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "rayhanat",
+  "homepage": "https://github.com/idiot95/rayhanat-design-system",
+  "items": [
+    {
+      "name": "theme",
+      "type": "registry:file",
+      "title": "al-Rayhaanat theme",
+      "description": "The one brand file: tokens, eight module hue slots, Kanz al-Lulu for Arabic script, and Tailwind's default palette removed.",
+      "files": [
+        {
+          "path": "registry/theme/theme.css",
+          "type": "registry:file",
+          "target": "src/styles/rayhanat.css"
+        }
+      ]
+    },
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "cn()",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "files": [
+        {
+          "path": "registry/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "dependencies": [
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "dependencies": [
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/card.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "dependencies": [
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/checkbox.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/input.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/label.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/switch.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/table.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "dependencies": [
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/ui/tabs.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "mark",
+      "type": "registry:component",
+      "description": "The V2 flower in its four permitted forms.",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/mark.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/mark.tsx"
+        }
+      ]
+    },
+    {
+      "name": "modules",
+      "type": "registry:component",
+      "description": "The module manifest: key, name, lucide icon, blurb, link.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/modules.ts",
+          "type": "registry:component",
+          "target": "src/components/brand/modules.ts"
+        }
+      ]
+    },
+    {
+      "name": "module-badge",
+      "type": "registry:component",
+      "description": "ModuleBadge and TodayDot: the only places a module hue appears.",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme",
+        "@rayhanat/modules"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/module-badge.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/module-badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "wordmark",
+      "type": "registry:component",
+      "description": "The flower with the name, inline or stacked.",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme",
+        "@rayhanat/mark"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/wordmark.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/wordmark.tsx"
+        }
+      ]
+    },
+    {
+      "name": "page-header",
+      "type": "registry:component",
+      "description": "Page titles in Cormorant: the only use of the display face.",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/page-header.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/page-header.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:component",
+      "description": "Sidebar, NavGroup, NavItem, ModuleSwitcher, UserChip. No petals.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme",
+        "@rayhanat/module-badge"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/sidebar.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/sidebar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "mobile-nav",
+      "type": "registry:component",
+      "description": "MobileBar and BottomNav.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/mobile-nav.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/mobile-nav.tsx"
+        }
+      ]
+    },
+    {
+      "name": "date-tile",
+      "type": "registry:component",
+      "description": "DateRow for member-facing lists.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/date-tile.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/date-tile.tsx"
+        }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:component",
+      "description": "Empty lists with the grayscale inner mark.",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme",
+        "@rayhanat/mark"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/empty-state.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/empty-state.tsx"
+        }
+      ]
+    },
+    {
+      "name": "bloom",
+      "type": "registry:component",
+      "description": "The flower at scale, cropped by its container's edge. Size and position change; the mark does not.",
+      "dependencies": [],
+      "registryDependencies": [
+        "@rayhanat/utils",
+        "@rayhanat/theme",
+        "@rayhanat/mark"
+      ],
+      "files": [
+        {
+          "path": "registry/brand/bloom.tsx",
+          "type": "registry:component",
+          "target": "src/components/brand/bloom.tsx"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkbox",
+  "dependencies": [
+    "radix-ui",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/ui/checkbox.tsx",
+      "content": "import * as React from \"react\";\nimport { Checkbox as CheckboxPrimitive } from \"radix-ui\";\nimport { CheckIcon } from \"lucide-react\";\nimport { cn } from \"@/lib/utils\";\n\nfunction Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {\n  return (\n    <CheckboxPrimitive.Root data-slot=\"checkbox\"\n      className={cn(\"peer size-4 shrink-0 rounded-[4px] border border-input bg-background shadow-xs transition-shadow outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground\", className)}\n      {...props}>\n      <CheckboxPrimitive.Indicator data-slot=\"checkbox-indicator\" className=\"flex items-center justify-center text-current transition-none\">\n        <CheckIcon className=\"size-3.5\" />\n      </CheckboxPrimitive.Indicator>\n    </CheckboxPrimitive.Root>\n  );\n}\n\nexport { Checkbox };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

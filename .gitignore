@@ -1,54 +1,7 @@
-# dependencies
 node_modules/
-.pnp
-.pnp.js
-
-# build output
 dist/
-build/
+test-results/
+playwright-report/
 *.tsbuildinfo
-.next/
-.vercel/
-out/
-
-# ...but the design system's generated artifacts are COMMITTED on purpose, so
-# consumers need no build step (see packages/tokens/README.md). Without these
-# negations the published packages ship with no tokens at all.
-!packages/tokens/dist/
-!packages/tokens/dist/**
-!packages/slides/dist/
-!packages/slides/dist/**
-!packages/ui/dist/
-!packages/ui/dist/**
-
-# local env / auth — never commit your registry token
-.npmrc
-.env
-.env.local
-.env.*.local
-
-# editor & OS
 .DS_Store
-.idea/
-*.swp
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-
-# logs
-npm-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-*.log
-
-# test / cache
-coverage/
-.turbo/
-.cache/
-.vite/
-
-# manual design-system import staging (not published)
-_import/
-
-# design system export archives
-*.zip
+.env*

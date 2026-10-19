@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/ui/input.tsx",
+      "content": "import * as React from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nfunction Input({ className, type, ...props }: React.ComponentProps<\"input\">) {\n  return (\n    <input\n      type={type}\n      data-slot=\"input\"\n      className={cn(\n        \"flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm\",\n        \"focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]\",\n        \"aria-invalid:border-destructive aria-invalid:ring-destructive/20\",\n        className\n      )}\n      {...props}\n    />\n  );\n}\n\nexport { Input };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

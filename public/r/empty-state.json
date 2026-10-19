@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "empty-state",
+  "description": "Empty lists with the grayscale inner mark.",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme",
+    "@rayhanat/mark"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/empty-state.tsx",
+      "content": "import type * as React from \"react\";\nimport { Mark } from \"@/components/brand/mark\";\n\n/** Empty lists: the inner mark in grey, a sentence, one action. */\nexport function EmptyState({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) {\n  return (\n    <div className=\"flex flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-8 text-center\">\n      <span className=\"grid size-12 place-items-center rounded-full bg-muted\"><Mark variant=\"inner\" tone=\"grayscale\" size={28} /></span>\n      <p className=\"font-medium\">{title}</p>\n      {description && <p className=\"text-sm text-muted-foreground\">{description}</p>}\n      {action}\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/empty-state.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

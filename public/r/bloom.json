@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bloom",
+  "description": "The flower at scale, cropped by its container's edge. Size and position change; the mark does not.",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme",
+    "@rayhanat/mark"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/bloom.tsx",
+      "content": "import type * as React from \"react\";\nimport { cn } from \"@/lib/utils\";\nimport { Mark } from \"@/components/brand/mark\";\n\n/*\n * The flower at scale, cropped by the edge of its container: it blooms in from\n * a corner or an edge instead of sitting in a box like an icon. The mark itself\n * is untouched (no recolour, no fade); only its size and position change.\n *\n * The parent must be `relative overflow-hidden`. Keep text clear of the flower:\n * it is decoration, never a background for words. On phones, never place it\n * at the top of the screen: the status bar (time, signal, battery) lives there.\n * Use a bottom placement on the header band instead.\n */\ntype Placement = \"top-start\" | \"top-end\" | \"bottom-start\" | \"bottom-end\" | \"top\" | \"bottom\";\n\nexport function Bloom({\n  size,\n  placement,\n  crop = 0.4,\n  tone = \"colour\",\n  className,\n}: {\n  /** Diameter of the whole flower in px, before cropping. 96 and up. */\n  size: number;\n  placement: Placement;\n  /** Share of the flower hidden past each cropping edge, 0–0.6. */\n  crop?: number;\n  tone?: \"colour\" | \"grayscale\";\n  className?: string;\n}) {\n  const offset = -Math.round(size * Math.min(Math.max(crop, 0), 0.6));\n  const style: React.CSSProperties = {};\n  if (placement.startsWith(\"top\")) style.top = offset;\n  if (placement.startsWith(\"bottom\")) style.bottom = offset;\n  if (placement.endsWith(\"start\")) style.insetInlineStart = offset;\n  if (placement.endsWith(\"end\")) style.insetInlineEnd = offset;\n  if (placement === \"top\" || placement === \"bottom\") {\n    style.insetInlineStart = \"50%\";\n    style.translate = \"-50% 0\";\n  }\n  return (\n    <span aria-hidden=\"true\" className={cn(\"pointer-events-none absolute flex\", className)} style={style}>\n      <Mark size={size} tone={tone} />\n    </span>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/bloom.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

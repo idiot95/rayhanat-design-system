@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "modules",
+  "description": "The module manifest: key, name, lucide icon, blurb, link.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/modules.ts",
+      "content": "import type { LucideIcon } from \"lucide-react\";\nimport { CalendarDays, ShieldCheck, UserPlus } from \"lucide-react\";\n\n/*\n * The module manifest. One entry per module; the gateway lists these and each\n * module's sidebar uses its own. A module's colour comes from its hue slot in\n * theme.css ([data-module=\"key\"]), never from here.\n */\nexport type ModuleKey = \"access\" | \"hoto\" | \"registration\";\n\nexport type ModuleEntry = {\n  key: ModuleKey;\n  name: string;\n  /** A lucide icon. Modules are never represented by the flower. */\n  icon: LucideIcon;\n  blurb: string;\n  href: string;\n};\n\nexport const MODULES: ModuleEntry[] = [\n  { key: \"access\", name: \"User Access\", icon: ShieldCheck, blurb: \"Who may do what, and in which jamiat.\", href: \"https://useraccess.daeratulaqeeq.org\" },\n  { key: \"hoto\", name: \"Hoto\", icon: CalendarDays, blurb: \"Programme schedules for the year.\", href: \"https://hoto.daeratulaqeeq.org\" },\n  { key: \"registration\", name: \"Registration\", icon: UserPlus, blurb: \"Member sign-ups and review.\", href: \"https://registration.daeratulaqeeq.org\" },\n];\n\nexport const moduleByKey = (key: ModuleKey) => MODULES.find((m) => m.key === key)!;\n",
+      "type": "registry:component",
+      "target": "src/components/brand/modules.ts"
+    }
+  ],
+  "type": "registry:component"
+}

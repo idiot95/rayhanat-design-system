@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "./rayhanat.css";
+
+body {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}

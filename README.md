@@ -1,383 +1,81 @@
-<div align="center">
+# al-Rayhaanat v2
 
-<img src="assets/motif-flower.svg" width="72" alt="">
+The design system for Daeratul Aqeeq apps: **stock shadcn/ui, one brand theme,
+eleven brand components, and the checks that hold them in place.**
 
-# al-Rayhaanat Design System
+v1 hand-built 154 components and enforced its rules in prose. v2 builds almost
+nothing: components come from shadcn, the brand is a theme file, and every rule
+is a lint rule or a test that fails CI.
 
-**Tokens, components and layout for Daeratul Aqeeq products.**
-One install, 154 components, light and dark, Latin and Arabic.
+## What is here
 
-`v1.3.0` · React 18+ · [Token reference](packages/tokens/README.md) · [Package map](packages/README.md) · [For AI agents](AGENTS.md)
+| Path | What it is |
+|---|---|
+| `registry/theme/theme.css` | The theme: tokens (light and dark), eight module hue slots, Kanz al-Lulu for Arabic script, Tailwind's default palette removed |
+| `registry/ui/` | The shadcn/ui components apps install (button, badge, card, input, label, table, tabs, checkbox, switch) |
+| `registry/brand/` | The eleven brand components: `Mark`, `Bloom`, `Wordmark`, `PageHeader`, `ModuleBadge` + `TodayDot`, `Sidebar` parts, `MobileBar` + `BottomNav`, `DateRow`, `EmptyState`, and the `modules` manifest |
+| `registry.json` → `public/r/` | The shadcn registry, built with `pnpm registry:build` and served as static files |
+| `brand/flower-v2.svg` | The V2 flower, as supplied. `Mark` renders it; nothing else may |
+| `brand/fonts/` | Kanz al-Lulu |
+| `eslint/brand-caps.js` | The hard caps as lint rules, importable by any app |
+| `scripts/` | Contrast cap and no-fork (drift) cap |
+| `tests/brand.spec.ts` | The rendered caps: mark integrity, one primary per screen, axe |
+| `apps/showcase/` | Every screen and component, consuming the registry like a real app |
+| `AGENTS.md` | The manifest for people and AI agents |
 
-</div>
-
----
-
-## Install
-
-Two steps. The first is once per machine; the second is once per project.
-
-### 1. Authenticate (once per machine)
-
-These packages live on **GitHub Packages**, not public npm, so your package
-manager needs a token before it can see them.
-
-Create a token with the **`read:packages`** scope only:
-
-> https://github.com/settings/tokens/new?scopes=read:packages&description=al-rayhaanat
-
-Add it to your shell profile (`~/.zshrc` on macOS):
+## Commands
 
 ```bash
-export GITHUB_TOKEN=ghp_your_token_here
-```
-
-Then `source ~/.zshrc` (or open a new terminal).
-
-### 2. Point the scope at GitHub (once per project)
-
-In the root of the project that will use the design system, create `.npmrc`:
-
-```ini
-@al-rayhaanat:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-Commit that file — it contains no secret, only a redirect and a variable
-reference. The token itself stays in your environment.
-
-### 3. Install
-
-```bash
-pnpm add @al-rayhaanat/system      # npm install / yarn add work too
-```
-
----
-
-## One required line of config
-
-The packages ship **source JSX**, not a pre-built bundle — deliberately, so
-components stay readable and debuggable inside the app that consumes them.
-Next.js does not transpile `node_modules` by default:
-
-```js
-// next.config.mjs
-export default { transpilePackages: ["@al-rayhaanat/system"] };
-```
-
-**Vite, Remix and Astro need nothing.** They transpile workspace sources
-already.
-
-Skip this on Next.js and the build fails with a syntax error pointing at a
-`<` character inside `node_modules` — that error means this line is missing,
-not that the package is broken.
-
----
-
-## Quick start
-
-```jsx
-// app/layout.jsx — the token stylesheet is imported ONCE, at the root
-import "@al-rayhaanat/system/tokens.css";
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en" dir="ltr" data-theme="light">
-      <body>{children}</body>
-    </html>
-  );
-}
-```
-
-```jsx
-// anywhere
-import { AppShell, SideNav, DataTable, Callout, Button } from "@al-rayhaanat/system";
-
-export default function Members() {
-  return (
-    <AppShell nav={<SideNav items={nav} />}>
-      <Callout tone="info">Registration closes on the 12th.</Callout>
-      <DataTable columns={columns} rows={rows} />
-      <Button variant="primary">Approve</Button>
-    </AppShell>
-  );
-}
-```
-
-Three attributes on `<html>` drive everything:
-
-| Attribute | Values | Effect |
-| --- | --- | --- |
-| `data-theme` | `light` · `dark` | Swaps the entire semantic colour layer |
-| `dir` | `ltr` · `rtl` | Mirrors layout and flips directional icons |
-| `lang` | `en` · `ar` | Selects Kanz al-Lulu and its corrected Arabic leading |
-
-Nothing else needs to know about theme or direction. There is no provider, no
-context, no `useTheme()` — it is CSS custom properties all the way down.
-
----
-
-## What you get
-
-Install `@al-rayhaanat/system` and all of this comes from one import:
-
-| Package | Exports | What it is |
-| --- | --- | --- |
-| [`ui`](packages/ui) | 35 | Primitives and layout — `Button`, `Card`, `Input`, `Stack`, `Grid`, `Split`, `useBreakpoint` |
-| [`prose`](packages/prose) | 18 | Rich text — `Callout`, `Steps`, `PullQuote`, `CodeBlock`, `Footnotes`, five list markers |
-| [`patterns`](packages/patterns) | 23 | Overlays, states and the ghost toolbar controls — `Modal`, `Drawer`, `Toast`, `CommandPalette`, `GhostButton`, `ExpandingSearch` |
-| [`filters`](packages/filters) | 13 | Declared and dynamic filters with the URL as state — `FilteredTable`, `FilterBar`, `SavedViews` |
-| [`slides`](packages/slides) | 12 | Deck layouts plus `buildDeck()` for pptxgenjs |
-| [`forms`](packages/forms) | 11 | `FormField` and the aria wiring; optional React Hook Form adapter |
-| [`shell`](packages/shell) | 10 | Four app frames — `AppShell`, `MarketingShell`, `MobileShell`, `FocusShell` |
-| [`charts`](packages/charts) | 9 | `LineChart`, `AreaChart`, `BarChart`, `DonutChart`, `Sparkline`, `Stat` |
-| [`motion`](packages/motion) | 8 | `Transition`, `FadeIn`, `Collapse`, `Stagger` — `prefers-reduced-motion` handled once, here |
-| [`icons`](packages/icons) | 7 | The mark (auto-simplifying by size), `Petal`, `Spinner`, 42 glyphs with mirror flags |
-| [`table`](packages/table) | 6 | One headless core, many presentations — `DataTable`, `useTableState` |
-| [`contracts`](packages/contracts) | 2 | The behaviour every family owes its caller, as data, plus the minimum test suite |
-| [`tokens`](packages/tokens) | — | The token layer: CSS vars, TS, Tailwind preset, Figma variables, the Arabic face |
-| [`config`](packages/config) | — | ESLint, TypeScript and Prettier config — the enforcement mechanism |
-
-One package sits outside that list and is **not** part of `system`:
-
-| Package | | |
-| --- | --- | --- |
-| [`access`](packages/access) | — | No React, no tokens. The module side of [User Access](packages/access/README.md): verify the signed envelope, gate the route, check the write. Install it only in a module that is governed by the access console. |
-
-### Why one package and not fourteen
-
-You *can* install the individual packages, but **the default is `system` and you
-should have a measured reason to deviate.** A product that installs a subset
-loses behaviour *silently*:
-
-- `patterns` without `motion` → overlays appear instantly and
-  `prefers-reduced-motion` is never consulted, because that handling lives in
-  `motion`.
-- `ui` without `tokens.css` → every `var(--*)` falls back to nothing. No colour,
-  no type, no spacing. **It still renders**, which is the dangerous part.
-- `filters` without `table` → a filter bar with nothing underneath it.
-- `shell` without `patterns` → the mobile drawer has no focus trap.
-
-If you do split, [`packages/README.md`](packages/README.md) lists what each one
-needs, and every manifest declares it under `arh.requiresTranspile`.
-
----
-
-## Tokens
-
-Products reference **semantic** names only:
-
-```css
-color: var(--text-muted);
-background: var(--surface-sunken);
-border: 1px solid var(--border-control);
-```
-
-The ramps (`--color-crimson-500`) exist so semantics can be composed. Reaching
-for one from application code is a lint error, as is a raw hex, an arbitrary
-Tailwind value, or a physical `margin-left`.
-
-Using Tailwind? The preset maps semantic names to the variables, so dark mode
-stays a data attribute rather than a second palette:
-
-```js
-// tailwind.config.js
-module.exports = { presets: [require("@al-rayhaanat/tokens/tailwind")] };
-```
-
-Not using React at all — a printed statement, an email, a legacy module?
-`tokens.css` ships a CSS-only block layer (`.arh-stack`, `.arh-grid`,
-`.arh-card`, `.arh-cluster`) that compiles to exactly what the React components
-render.
-
-Full reference, including the contrast audit and the Arabic type decisions:
-[`packages/tokens/README.md`](packages/tokens/README.md).
-
----
-
-## Using this with an AI coding agent
-
-The design system ships machine-readable context so Claude Code, Cursor,
-Copilot, Windsurf or any agent writes code that follows the system instead of
-inventing its own.
-
-Copy [`AGENTS.md`](AGENTS.md) into the root of the project that consumes the
-design system. That single file is enough for most agents — Claude Code, Cursor,
-Copilot, Windsurf, Zed and Aider all read it automatically.
-
-For Claude Code specifically, [`CLAUDE.md`](CLAUDE.md) is a thinner pointer file
-that defers to `AGENTS.md`. For Cursor, [`.cursor/rules/`](.cursor/rules) holds
-the same guidance in its native format so the rules attach automatically by file
-glob rather than filling the context window.
-
-Pointing an agent at the system without installing anything?
-[`llms.txt`](llms.txt) is a flat, token-efficient index of every component and
-every token, designed to be pasted into a context window whole.
-
----
-
-## The documentation site
-
-[`apps/docs`](apps/docs) is a Next.js App Router project: fourteen pages, one
-per package plus foundations and the contracts. Every specimen on it is rendered
-by the packages in this repository, imported exactly the way a product imports
-them.
-
-That is the point of it. The site's own chrome is `AppShell`, `SideNav` and
-`TopBar`, and its `next.config.mjs` carries the `transpilePackages` line
-documented above — so the site **demonstrates** those instructions rather than
-asserting them. If the shell breaks, the documentation stops rendering instead
-of quietly describing something that no longer works. The foundations page
-generates every swatch, scale and ramp from the token data at runtime, so a
-renamed or removed token shows up there on the next build.
-
-The three toggles in the top bar set `data-theme`, `dir` and `lang` on the root
-element and nothing else. Watch the whole site follow.
-
-### Deploying it
-
-The site is a **static export**: every route is prerendered, so `pnpm build`
-emits plain HTML into `apps/docs/out` and there is no Next.js runtime to host.
-[`vercel.json`](vercel.json) points Vercel at that directory.
-
-Import the repository and deploy. **No project settings need changing** — not
-the Root Directory, not the framework preset. Everything is in the file, so it
-cannot drift and it cannot be half-applied.
-
-The build consumes the packages through `workspace:*`, so **no registry token is
-required** — it reads the source next door rather than installing from GitHub
-Packages.
-
-```bash
-pnpm build               # → apps/docs/out
-```
-
-Because the output is ordinary static files, the same build deploys to GitHub
-Pages, S3, Netlify or any file host. Nothing about it is Vercel-specific.
-
-> [!NOTE]
-> Deploying it as a **Next.js** project instead needs the Root Directory set to
-> `apps/docs`, because the repository root has no `next` dependency for Vercel's
-> builder to find. Both failure modes report a *successful* build and neither
-> error names its real cause: pointing a root-level project at `apps/docs/.next`
-> serves `404: NOT_FOUND` on every URL, and leaving the framework preset on
-> `Other` fails with `No Output Directory named "public" found`. The static
-> export sidesteps both.
-
-The build consumes the packages through `workspace:*`, so **no registry token is
-required** — it reads the source next door rather than installing from GitHub
-Packages.
-
-```bash
-pnpm build               # the same build, locally
-```
-
----
-
-## Local development
-
-```bash
-git clone git@github.com:idiot95/rayhanat-design-system.git
-cd rayhanat-design-system
-corepack enable          # activates the pinned pnpm
 pnpm install
-pnpm dev                 # documentation site with every component, live
+pnpm dev              # the showcase
+pnpm check            # every cap: lint, typecheck, contrast, drift, build, Playwright
+pnpm registry:build   # regenerate public/r from registry.json
 ```
 
-| Command | What it does |
-| --- | --- |
-| `pnpm dev` | Documentation site — every component, both themes, both directions |
-| `pnpm build` | Production build of the documentation site |
-| `pnpm lint` | The rules that fail the build |
-| `pnpm typecheck` | `tsc --noEmit`, strict |
-| `pnpm test` | The contracts' minimum suite |
-| `pnpm build:bundle` | Regenerates `arh.global.jsx` for bundler-less surfaces |
+## The flower
 
-> [!NOTE]
-> `AppShell` wraps its main content in `FadeIn`, which renders `null` on the
-> server. A green `next build` therefore does **not** prove a page renders — the
-> prerender never executes it. Verify pages in a browser, or with the chrome
-> bypassed.
+The V2 mark has three layers: sand outer petals `#f5ecdf`, rose inner petals
+`#dd8a8d`, crimson centre `#e72350`. Four forms are permitted, and only through
+`<Mark />`:
 
-> [!WARNING]
-> **Do not run `pnpm build:tokens`.** It is currently destructive — it deletes
-> `chartSequence` and reshapes the public token API. `packages/tokens/dist/` is
-> authoritative and committed. See [`docs/TOKEN-PIPELINE.md`](docs/TOKEN-PIPELINE.md)
-> for what has to be reconciled before that command is safe again.
+| | Colour | Grayscale |
+|---|---|---|
+| Full | `<Mark />` | `<Mark tone="grayscale" />` |
+| Inner layer only | `<Mark variant="inner" />` | `<Mark variant="inner" tone="grayscale" />` |
 
----
+Below 32px `Mark` always renders the inner layer: the pale outer petals blur
+into a halo at small sizes. Recolouring, inverting, tinting, outlining, fading
+or redrawing it is not permitted. Modules are identified by a lucide icon on their hue
+(`ModuleBadge`), never by the flower.
 
-## Releasing
+## Hard caps
 
-All fifteen packages move together on one version. A `shell` newer than its
-`patterns` is exactly the drift this system exists to prevent, so partial
-upgrades are not expressible — sibling dependencies are `workspace:*`.
+| Cap | Enforced by |
+|---|---|
+| Only brand colours exist | Tailwind palette reset in `theme.css`; lint bans colour literals and arbitrary colour classes |
+| The flower is never altered | `Mark` accepts only `size`, `variant`, `tone`, `title`; lint bans other props and filter utilities; Playwright reads every rendered mark's fills, filter and ancestors |
+| The flower lives in one file | Lint bans its path data outside `brand/mark.tsx` |
+| Cormorant on page titles only | `font-display` allowed only in `PageHeader` and `Wordmark` |
+| Module hue in two places | `*-module` classes allowed only in `module-badge.tsx` |
+| No other UI or icon libraries | Lint `no-restricted-imports` |
+| No forks | `scripts/check-drift.mjs` compares app copies with the registry |
+| One primary button per screen | Playwright, per `[data-screen]` |
+| Readable colours | `scripts/check-contrast.mjs`: 4.5:1 text, 3:1 controls, both modes |
+| Accessible pages | axe in Playwright |
 
-```bash
-pnpm changeset          # describe the change, choose the bump
-git add . && git commit -m "feat: ..." && git push
-```
+## Notes
 
-CI opens a **Version Packages** PR. Merging it publishes every package to
-GitHub Packages and tags the release.
-
----
-
-## Troubleshooting
-
-<details>
-<summary><b>401 Unauthorized on install</b></summary>
-
-Your `GITHUB_TOKEN` is unset, expired, or missing the `read:packages` scope.
-Check it is visible to the shell running the install:
-
-```bash
-echo $GITHUB_TOKEN
-```
-
-If the repository sits under an organisation that enforces SSO, the token also
-has to be authorised for it — open the token's page, click **Configure SSO**, and
-authorise that organisation. The 401 does not mention SSO anywhere, which is what
-makes this the most common cause.
-</details>
-
-<details>
-<summary><b>404 Not Found on install</b></summary>
-
-Almost always a missing `.npmrc`, so the request went to public npm where these
-packages do not exist. Confirm the file is in the directory you are installing
-from, and that the scope line reads exactly `@al-rayhaanat:registry=...`.
-</details>
-
-<details>
-<summary><b>Unexpected token '&lt;' inside node_modules</b></summary>
-
-Next.js is not transpiling the packages. Add `transpilePackages` — see
-[One required line of config](#one-required-line-of-config).
-</details>
-
-<details>
-<summary><b>Components render but are completely unstyled</b></summary>
-
-`tokens.css` was never imported, so every `var(--*)` resolves to nothing. Add
-`import "@al-rayhaanat/system/tokens.css"` at your app's root — once, not per
-component.
-</details>
-
-<details>
-<summary><b>Arabic text renders in the wrong face or clips its marks</b></summary>
-
-Set `lang="ar"` on the element (or `dir="rtl"`), which selects Kanz al-Lulu and
-its corrected leading. If marks still clip, the content is vocalised — raise
-`--leading-ar-floor` from `1.45` to `1.70`. Note that `tokens.css` and
-`tokens.ts` currently disagree on some Arabic leading steps; see
-[`docs/TOKEN-PIPELINE.md`](docs/TOKEN-PIPELINE.md).
-</details>
-
----
+- `registry/ui/` was written to match shadcn/ui's new-york v4 components because
+  the shadcn website was unreachable from the build environment. Two
+  deliberate differences from upstream: `Button` emits `data-variant` (used by
+  the one-primary test) and the destructive variants use
+  `text-destructive-foreground` (white text fails on clay in dark mode). When
+  refreshing from upstream, keep those two and run `pnpm check`.
+- Hosting the registry: any static host works. Serve `public/r/` and put its
+  URL in each app's `components.json` (see `components.example.json`).
 
 ## Licence
 
 `UNLICENSED` — proprietary to Daeratul Aqeeq. The Kanz al-Lulu typeface is
-© 2025 Abdulqadir Abdeali Jariwala and is distributed with this package for use
-in Daeratul Aqeeq products.
+© 2025 Abdulqadir Abdeali Jariwala and is distributed for use in Daeratul Aqeeq
+products.

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "wordmark",
+  "description": "The flower with the name, inline or stacked.",
+  "dependencies": [],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme",
+    "@rayhanat/mark"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/wordmark.tsx",
+      "content": "import type * as React from \"react\";\nimport { cn } from \"@/lib/utils\";\nimport { Mark } from \"@/components/brand/mark\";\n\n/**\n * The flower with the name. \"inline\" for headers and sidebars; \"stacked\" for\n * sign-in screens, with an optional line underneath (a welcome, a product name).\n */\nexport function Wordmark({\n  size = 24,\n  layout = \"inline\",\n  subtitle,\n  withMark = true,\n  className,\n}: {\n  size?: number;\n  layout?: \"inline\" | \"stacked\";\n  subtitle?: React.ReactNode;\n  /** Set false when a <Bloom /> already carries the flower on the same surface. */\n  withMark?: boolean;\n  className?: string;\n}) {\n  if (layout === \"stacked\") {\n    return (\n      <div className={cn(\"flex flex-col items-start gap-2\", className)}>\n        {withMark && <Mark size={size} />}\n        <span className=\"font-display text-3xl leading-tight font-semibold\">Daeratul Aqeeq</span>\n        {subtitle && <span className=\"text-muted-foreground\">{subtitle}</span>}\n      </div>\n    );\n  }\n  return (\n    <span className={cn(\"flex items-center gap-2\", className)}>\n      {withMark && <Mark size={size} />}\n      <span className=\"font-display text-lg leading-none font-semibold\">Daeratul Aqeeq</span>\n    </span>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/wordmark.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

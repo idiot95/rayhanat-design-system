@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-tile",
+  "description": "DateRow for member-facing lists.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "@rayhanat/utils",
+    "@rayhanat/theme"
+  ],
+  "files": [
+    {
+      "path": "registry/brand/date-tile.tsx",
+      "content": "import type * as React from \"react\";\nimport { Clock } from \"lucide-react\";\n\n/** A list row that leads with the day and date. Member-facing lists use this. */\nexport function DateRow({ day, date, title, meta, trailing }: { day: string; date: string; title: string; meta: string; trailing?: React.ReactNode }) {\n  return (\n    <div className=\"flex items-center gap-3 rounded-xl border bg-card p-3\">\n      <div className=\"flex w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-accent py-1.5 text-accent-foreground\">\n        <span className=\"text-[10px] font-semibold uppercase\">{day}</span>\n        <span className=\"text-2xl leading-none font-semibold tabular-nums\">{date}</span>\n      </div>\n      <div className=\"min-w-0 flex-1\">\n        <p className=\"truncate font-medium\">{title}</p>\n        <p className=\"flex items-center gap-1 text-xs text-muted-foreground\"><Clock aria-hidden=\"true\" className=\"size-3\" /> {meta}</p>\n      </div>\n      {trailing}\n    </div>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "src/components/brand/date-tile.tsx"
+    }
+  ],
+  "type": "registry:component"
+}
