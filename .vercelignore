@@ -1,0 +1,15 @@
+# What a CLI deploy must not upload. A Git-linked deploy never sees most of
+# this — these are the v1 branch's build output and import scratch, which sit
+# untracked in a working tree that has been on `main`.
+node_modules
+apps/docs
+_import
+*.zip
+
+# Build output: Vercel produces its own.
+apps/showcase/dist
+dist
+
+# Test artefacts.
+test-results
+playwright-report
