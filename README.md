@@ -12,7 +12,7 @@ is a lint rule or a test that fails CI.
 | Path | What it is |
 |---|---|
 | `registry/theme/theme.css` | The theme: tokens (light and dark), eight module hue slots, Kanz al-Lulu for Arabic script, Tailwind's default palette removed |
-| `registry/ui/` | The shadcn/ui components apps install (button, badge, card, input, label, table, tabs, checkbox, switch) |
+| `registry/ui/` | The twenty-five shadcn/ui components apps install: button, badge, card, input, label, table, tabs, checkbox, switch, dialog, sheet, dropdown-menu, select, popover, command, tooltip, sonner, alert, separator, skeleton, avatar, progress, scroll-area, textarea, radio-group |
 | `registry/brand/` | The eleven brand components: `Mark`, `Bloom`, `Wordmark`, `PageHeader`, `ModuleBadge` + `TodayDot`, `Sidebar` parts, `MobileBar` + `BottomNav`, `DateRow`, `EmptyState`, and the `modules` manifest |
 | `registry.json` → `public/r/` | The shadcn registry, built with `pnpm registry:build` and served as static files |
 | `brand/flower-v2.svg` | The V2 flower, as supplied. `Mark` renders it; nothing else may |
@@ -65,14 +65,30 @@ or redrawing it is not permitted. Modules are identified by a lucide icon on the
 
 ## Notes
 
-- `registry/ui/` was written to match shadcn/ui's new-york v4 components because
-  the shadcn website was unreachable from the build environment. Two
-  deliberate differences from upstream: `Button` emits `data-variant` (used by
-  the one-primary test) and the destructive variants use
+- The **first nine** components in `registry/ui/` were written by hand to match
+  shadcn/ui's new-york v4 because the shadcn website was unreachable from the
+  build environment. Two deliberate differences from upstream: `Button` emits
+  `data-variant` (used by the one-primary test) and the destructive variants use
   `text-destructive-foreground` (white text fails on clay in dark mode). When
   refreshing from upstream, keep those two and run `pnpm check`.
+- The **other sixteen** were taken verbatim from
+  `ui.shadcn.com/r/styles/new-york-v4/<name>.json`, so refreshing them is a
+  clean diff rather than a re-reading. Four substitutions were applied, and
+  they are the only places these files differ from upstream:
+
+  | Substitution | Where | Why |
+  |---|---|---|
+  | `from "cn"` → `from "@/lib/utils"` | 15 files | `cn()` is `@rayhanat/utils` here |
+  | `@/registry/new-york-v4/ui/*` → `@/components/ui/*` | `dialog`, `command` | the alias apps actually install into |
+  | `bg-black/50` → `bg-foreground/50` | `dialog`, `sheet` overlays | the palette reset deletes `black`, so upstream's overlay emits **no colour at all** — an invisible scrim, which lint cannot catch because `black` is a named utility and not an arbitrary one |
+  | `next-themes` removed | `sonner` | the theme is `data-theme` on `<html>` from a cookie, not a React provider; the toaster's colours are already tokens, so `theme="system"` is the only correct value |
+
+  `import * as React from "react"` was added to `skeleton` and `sonner`, which
+  upstream leaves to the UMD global that this repo's `tsconfig` rejects.
 - Hosting the registry: any static host works. Serve `public/r/` and put its
   URL in each app's `components.json` (see `components.example.json`).
+  `vercel.json` deploys the showcase at `/` and the registry at `/r/{name}.json`
+  from one build, so staging a registry change is a push.
 
 ## Licence
 
