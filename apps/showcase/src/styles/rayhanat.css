@@ -16,7 +16,11 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  /* The corner. Everything else is derived from it — sm is 4px tighter, md
+     2px, xl 4px looser — so this one value is the whole system's curve.
+     0.625rem is shadcn's own; al-Rayhaanat sits a step softer, which reads
+     closer to the flower than to a form. */
+  --radius: 0.875rem;
 
   --background: #fffdfa;
   --foreground: #1e1a15;
